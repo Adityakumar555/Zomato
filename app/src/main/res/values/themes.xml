@@ -1,0 +1,55 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Base.Theme.Zomato" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Customize your light theme here. -->
+
+
+         <item name="colorPrimary">@color/black</item>
+
+        <item name="android:windowLightStatusBar">true</item>
+
+<!--
+        <item name="android:fitsSystemWindows">true</item>
+-->
+
+
+
+    </style>
+
+    <style name="BaseTheme.White_StatusBar" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="android:windowIsTranslucent">true</item>
+    </style>
+
+
+
+
+
+    <style name="ImageView.Corner" parent="">
+        <item name="cornerSizeTopRight">0dp</item>
+        <item name="cornerSizeTopLeft">0dp</item>
+        <item name="cornerSizeBottomLeft">20dp</item>
+        <item name="cornerSizeBottomRight">20dp</item>
+        <item name="cornerFamily">rounded</item>
+    </style>
+
+
+    <!-- Custom style for TabLayout -->
+    <style name="CustomTabLayoutStyle" parent="Widget.MaterialComponents.TabLayout">
+        <!-- Tab Indicator -->
+        <item name="tabIndicator">@drawable/tab_indicator_top</item> <!-- Use the custom drawable for the indicator -->
+        <item name="tabIndicatorColor">#EF0C4C</item> <!-- Tab indicator color -->
+        <item name="tabIndicatorHeight">4dp</item>  <!-- Height of the indicator -->
+        <item name="tabSelectedTextColor">#EF0C4C</item> <!-- Selected tab text color -->
+        <item name="tabTextColor">@color/black</item> <!-- Unselected tab text color -->
+
+        <!-- Optional tab style settings -->
+        <item name="tabMode">fixed</item> <!-- Tab mode (scrollable or fixed) -->
+    </style>
+
+
+
+    <style name="Theme.Zomato" parent="Base.Theme.Zomato" />
+
+
+
+</resources>
