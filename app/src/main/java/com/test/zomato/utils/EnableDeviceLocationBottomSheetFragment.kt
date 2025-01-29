@@ -1,6 +1,5 @@
 package com.test.zomato.utils
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -11,7 +10,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity.RESULT_OK
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.test.zomato.databinding.FragmentEnableDeviceLocationBottomSheetBinding
-import com.test.zomato.view.main.MainActivity
 
 class EnableDeviceLocationBottomSheetFragment : BottomSheetDialogFragment() {
 
@@ -40,7 +38,7 @@ class EnableDeviceLocationBottomSheetFragment : BottomSheetDialogFragment() {
         }
 
         binding.enableLocation.setOnClickListener {
-            if (myHelper.checkPermission()) {
+            if (myHelper.checkLocationPermission()) {
                 if (!myHelper.isLocationEnable()) {
                     myHelper.onGPS(resultLauncher)
                 }

@@ -7,17 +7,22 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.test.zomato.repository.GeoApifyRepository
+import com.test.zomato.repository.roomDb.CartDatabase
 import com.test.zomato.repository.roomDb.RoomDbRepository
 import com.test.zomato.view.location.models.PlaceFeature
+import com.test.zomato.view.location.models.UserSavedAddress
+import com.test.zomato.view.location.repository.UserSavedAddressDao
+import com.test.zomato.view.location.repository.UserSavedAddressRepository
+import com.test.zomato.view.login.repository.UserRepository
 import com.test.zomato.view.main.home.models.FoodItem
 import com.test.zomato.view.main.home.models.RestaurantDetails
 import kotlinx.coroutines.launch
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
 
-
-    var latitude: Double = 0.0
-    var longitude: Double = 0.0
+    private val userSavedAddressRepository by lazy {
+        UserSavedAddressRepository(CartDatabase.getInstance(application)!!.userSavedAddressDao())
+    }
 
     private val setCount = MutableLiveData<Int>(1)
     val count: LiveData<Int> = setCount
@@ -33,10 +38,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    // Set the initial count value to the passed quantity
-    fun setInitialQuantity(quantity: Int) {
-        setCount.value = quantity
-    }
 
 
     private val setLocationList = MutableLiveData<List<PlaceFeature>>()
@@ -52,13 +53,34 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
 
-    fun saveLocation(latitude: Double, longitude: Double) {
-        this.latitude = latitude
-        this.longitude = longitude
+    // Function to save user address
+    fun saveAddress(
+        receiverName: String,
+        receiverNumber: String,
+        saveAddressAs: String,
+        selectedLocation: String,
+        houseAddress: String,
+        nearbyLandmark: String
+    ) {
+        viewModelScope.launch {
+            val address = UserSavedAddress(
+                receiverName = receiverName,
+                receiverNumber = receiverNumber,
+                saveAddressAs = saveAddressAs,
+                selectedLocation = selectedLocation,
+                houseAddress = houseAddress,
+                nearbyLandmark = nearbyLandmark
+            )
+            userSavedAddressRepository.saveAddress(address)
+        }
     }
 
-
-
+    fun getAllAddresses() {
+        viewModelScope.launch {
+            val addresses = userSavedAddressRepository.getAllAddresses()
+            // Handle the list of addresses as needed (e.g., updating UI)
+        }
+    }
 
 
 }

@@ -19,6 +19,7 @@ class UserViewModel(application: Application) : AndroidViewModel(application) {
     private val _userLiveData = MutableLiveData<User?>()
     val userLiveData: LiveData<User?> = _userLiveData
 
+
     // Fetch user by phone number and update LiveData
     fun getUserByPhoneNumber(userNumber: String) {
         viewModelScope.launch {
@@ -28,20 +29,23 @@ class UserViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    // Function to save user data if it doesn't exist already
-    fun saveUserData(user: User) {
-        viewModelScope.launch {
-            // First, check if the user already exists in the database
-            val existingUser = userRepository.getUserByPhoneNumber(user.userNumber ?: "")
 
-            // If the user doesn't exist, save the new user
-            if (existingUser == null) {
-                userRepository.saveUser(user)
-            } else {
-                // Optionally, you can update the existing user if necessary
-                // For now, we just log or ignore as we are not updating in this case.
-                _userLiveData.postValue(existingUser)
-            }
+    fun saveUser(user: User){
+        viewModelScope.launch {
+            userRepository.saveUser(user)
+        }
+    }
+
+    fun updateUser(user: User){
+        viewModelScope.launch {
+            userRepository.updateUser(user)
+        }
+    }
+
+
+    fun updateUserProfile(imageUrl: String, id:Int){
+        viewModelScope.launch {
+            userRepository.updateUserProfile(imageUrl,id)
         }
     }
 }

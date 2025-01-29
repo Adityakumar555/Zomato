@@ -8,6 +8,7 @@
 
         <item name="android:windowLightStatusBar">true</item>
 
+
 <!--
         <item name="android:fitsSystemWindows">true</item>
 -->
@@ -49,6 +50,11 @@
 
 
     <style name="Theme.Zomato" parent="Base.Theme.Zomato" />
+
+    <style name="DialogTheme" parent="Theme.AppCompat.Light.Dialog">
+        <item name="colorAccent">@color/colorPrimary</item>
+    </style>
+
 
 
 

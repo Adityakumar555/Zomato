@@ -2,15 +2,11 @@ package com.test.zomato.view.location
 
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.location.Location
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationServices
 import com.test.zomato.databinding.ActivitySetLocationBinding
 import com.test.zomato.view.main.MainActivity
 import com.test.zomato.utils.EnableAppLocationPermissionDialogFragment
@@ -42,7 +38,7 @@ class SetLocationPermissionActivity : AppCompatActivity() {
                 }
             }
 
-        if (myHelper.checkPermission()) {
+        if (myHelper.checkLocationPermission()) {
             if (myHelper.isLocationEnable()) {
                 navigateToMainActivity()
             }
@@ -50,7 +46,7 @@ class SetLocationPermissionActivity : AppCompatActivity() {
 
 
         binding.enableDeviceLocation.setOnClickListener {
-            if (myHelper.checkPermission()) {
+            if (myHelper.checkLocationPermission()) {
                 if (!myHelper.isLocationEnable()) {
                     myHelper.onGPS(resultLauncher)
                 } else {

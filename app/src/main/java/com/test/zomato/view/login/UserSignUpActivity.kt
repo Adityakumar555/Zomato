@@ -39,7 +39,7 @@ class UserSignUpActivity : AppCompatActivity() {
 
         myHelper.setStatusBarIconColor(this,true)
 
-        if (myHelper.checkPermission()) {
+        if (myHelper.checkLocationPermission()) {
             Toast.makeText(this, "Permission granted", Toast.LENGTH_SHORT).show()
         } else {
             myHelper.requestLocationPermission(this)
@@ -76,7 +76,7 @@ class UserSignUpActivity : AppCompatActivity() {
 
             if (number.isEmpty()) {
                 binding.userNumber.requestFocus()
-            } else if (number.length != 10) {
+            } else if (number.length != 10 && myHelper.isValidPhoneNumber(number)) {
                 Toast.makeText(
                     this,
                     "Please enter a valid 10-digit phone number.",

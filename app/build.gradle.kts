@@ -135,5 +135,6 @@ dependencies {
 
 
     implementation("nl.dionsegijn:konfetti-xml:2.0.5")
+    implementation("com.github.dhaval2404:imagepicker:2.1")
 
 }

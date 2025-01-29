@@ -6,13 +6,13 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.content.pm.PackageManager
-import android.graphics.Color
 import android.location.Geocoder
 import android.location.LocationManager
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Build
 import android.util.Log
+import android.util.Patterns
 import android.view.View
 import android.view.WindowInsetsController
 import android.view.inputmethod.InputMethodManager
@@ -176,7 +176,7 @@ class MyHelper(private val context: Context) {
     }
 
 
-    fun checkPermission(): Boolean {
+    fun checkLocationPermission(): Boolean {
         return ContextCompat.checkSelfPermission(
             context, Manifest.permission.ACCESS_FINE_LOCATION
         ) == PackageManager.PERMISSION_GRANTED
@@ -241,6 +241,20 @@ class MyHelper(private val context: Context) {
         }
         return phone
     }
+
+    fun numberIs():String{
+        val userPhoneNumber = sharedPreferences.getString("userNumber", "") ?: ""
+        return userPhoneNumber
+    }
+
+
+
+
+     fun isValidPhoneNumber(phone: String): Boolean {
+        // This pattern is for validating phone numbers, can be adjusted as per your needs
+        return Patterns.PHONE.matcher(phone).matches()
+    }
+
 
     companion object {
         private const val CHANNEL_ID = "notification_channel"

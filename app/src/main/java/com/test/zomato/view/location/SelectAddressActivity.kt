@@ -1,5 +1,6 @@
 package com.test.zomato.view.location
 
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
@@ -59,15 +60,19 @@ class SelectAddressActivity : AppCompatActivity() {
             finish()
         }
 
+        binding.addAddress.setOnClickListener {
+            val intent = Intent(this,AddLocationFromMapActivity::class.java)
+            startActivity(intent)
+        }
 
-        if (!myHelper.checkPermission() || !myHelper.isLocationEnable()) {
+        if (!myHelper.checkLocationPermission() || !myHelper.isLocationEnable()) {
             binding.text1.text = "Device location not\nenabled"
             binding.text5.text = "Tab here to enable your device\nlocation for a better"
             binding.enableLocationBtn.visibility = View.VISIBLE
             binding.selectCurrentLocation.visibility = View.GONE
 
             binding.enableLocationBtn.setOnClickListener {
-                if (myHelper.checkPermission()) {
+                if (myHelper.checkLocationPermission()) {
                     if (!myHelper.isLocationEnable()) {
                         myHelper.onGPS(resultLauncher)
                     }

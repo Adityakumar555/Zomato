@@ -4,16 +4,19 @@ import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.bumptech.glide.Glide
 import com.test.zomato.R
 import com.test.zomato.databinding.FragmentDiningBinding
 import com.test.zomato.utils.MyHelper
 import com.test.zomato.view.location.SelectAddressActivity
+import com.test.zomato.view.login.repository.UserViewModel
 import com.test.zomato.view.main.home.adapter.BarAdapter
 import com.test.zomato.view.main.home.models.BarData
 import com.test.zomato.viewModels.MainViewModel
@@ -25,6 +28,7 @@ class DiningFragment : Fragment() {
     private lateinit var barAdapter: BarAdapter
 
     private lateinit var mainViewModel: MainViewModel
+    private lateinit var userViewModel: UserViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -35,6 +39,9 @@ class DiningFragment : Fragment() {
 
         myHelper.setStatusBarIconColor(requireActivity(), false)
         mainViewModel = ViewModelProvider(this)[MainViewModel::class.java]
+        userViewModel = ViewModelProvider(this)[UserViewModel::class.java]
+
+        fetchUserData(myHelper.numberIs())
 
 
         val dummyBarList = listOf(
@@ -166,6 +173,36 @@ class DiningFragment : Fragment() {
         setLocationOnToolbar()
 
         return binding.root
+    }
+
+
+    override fun onStart() {
+        super.onStart()
+        fetchUserData(myHelper.numberIs())
+    }
+
+
+    private fun fetchUserData(userPhoneNumber: String) {
+        if (userPhoneNumber.isNotEmpty()) {
+            userViewModel.getUserByPhoneNumber(userPhoneNumber)
+
+            activity?.let {
+                userViewModel.userLiveData.observe(it) { user ->
+                    user?.let {
+                        Log.d("userDataProfile", "fetchUserData: $user")
+
+                        if (!user.imageUrl.isNullOrEmpty()) {
+                            Glide.with(this).load(user.imageUrl).into(binding.userImage)
+                            binding.userFirstCharacter.visibility = View.GONE
+                            binding.userImage.visibility = View.VISIBLE
+                        } else {
+                            binding.userFirstCharacter.visibility = View.VISIBLE
+                            binding.userImage.visibility = View.GONE
+                        }
+                    }
+                }
+            }
+        }
     }
 
     private fun setLocationOnToolbar() {

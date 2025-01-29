@@ -133,8 +133,8 @@
 
                 <androidx.cardview.widget.CardView
                     android:id="@+id/profile"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
                     android:layout_alignParentEnd="true"
                     android:layout_centerVertical="true"
                     android:layout_marginEnd="16dp"
@@ -148,14 +148,23 @@
                          android:src="@drawable/join_prime_image" />
      -->
 
-                    <TextView
-                        android:layout_width="36dp"
-                        android:layout_height="36dp"
-                        android:gravity="center"
-                        android:text="A"
-                        android:textColor="@android:color/holo_blue_dark"
-                        android:textSize="18sp" />
+                    <ImageView
+                        android:id="@+id/userImage"
+                        android:layout_width="match_parent"
+                        android:scaleType="centerCrop"
+                        android:layout_height="match_parent"
+                        android:textColor="@android:color/holo_blue_dark" />
 
+                    <ImageView
+                        android:id="@+id/user_first_character"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:gravity="center"
+                        android:layout_margin="8dp"
+                        android:background="@drawable/user_icon"
+                        android:textColor="@android:color/holo_blue_dark"
+                        />
 
                 </androidx.cardview.widget.CardView>
 

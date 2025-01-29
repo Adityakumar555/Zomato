@@ -5,6 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
     android:background="#F3F4FA"
     tools:context=".view.main.home.UserProfileDetailsActivity">
 
@@ -94,18 +95,21 @@
 
                         <ImageView
                             android:id="@+id/userImage"
-                            android:layout_width="110dp"
-                            android:layout_height="110dp"
+                            android:layout_width="match_parent"
+                            android:scaleType="centerCrop"
+                            android:layout_height="match_parent"
                             android:textColor="@android:color/holo_blue_dark" />
 
-                        <TextView
+                        <ImageView
+                            android:id="@+id/user_first_character"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_centerInParent="true"
                             android:gravity="center"
-                            android:text="A"
+                            android:layout_margin="26dp"
+                            android:background="@drawable/user_icon"
                             android:textColor="@android:color/holo_blue_dark"
-                            android:textSize="38sp" />
+                            />
 
 
                     </RelativeLayout>
@@ -145,6 +149,7 @@
                 android:layout_height="match_parent"
                 android:layout_below="@id/bg1"
                 android:layout_marginStart="12dp"
+                android:layout_marginBottom="102dp"
                 android:layout_marginTop="-12dp"
                 android:layout_marginEnd="12dp"
                 app:cardCornerRadius="14dp"
@@ -162,9 +167,9 @@
                     <com.google.android.material.textfield.TextInputLayout
                         android:layout_width="match_parent"
                         android:layout_height="56dp"
+                        android:id="@+id/nameInputLayout"
                         android:layout_marginBottom="16dp"
                         app:boxBackgroundMode="outline"
-                        app:expandedHintEnabled="false"
                         app:boxStrokeColor="@android:color/black"
                         app:endIconMode="clear_text">
 
@@ -191,10 +196,14 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:hint="Mobile"
+                            android:maxLength="10"
                             android:textColorHint="@android:color/darker_gray"
                             android:fontFamily="@font/metropolis_medium"
-                            android:inputType="phone"
-                            android:text="8979116063" />
+                            android:inputType="number"
+                            android:clickable="false"
+                            android:focusable="false"
+                            android:focusableInTouchMode="false"
+                            android:text="" />
                     </com.google.android.material.textfield.TextInputLayout>
 
                     <!-- Email Input -->
@@ -219,6 +228,7 @@
                     <!-- Date of Birth Input -->
                     <com.google.android.material.textfield.TextInputLayout
                         android:layout_width="match_parent"
+                        android:id="@+id/dobInputLayout"
                         android:layout_height="56dp"
                         android:layout_marginBottom="16dp"
                         app:boxBackgroundMode="outline"

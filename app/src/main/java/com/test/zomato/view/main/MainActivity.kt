@@ -38,7 +38,7 @@ class MainActivity : AppCompatActivity(), OrderPlcaeClickListener {
         mainViewModel = ViewModelProvider(this)[MainViewModel::class.java]
 
 
-        if (myHelper.checkPermission() && myHelper.isLocationEnable()) {
+        if (myHelper.checkLocationPermission() && myHelper.isLocationEnable()) {
             // Fetch the last known location
             fusedLocationClient.lastLocation.addOnCompleteListener(this) { task ->
                 val location: Location? = task.result
@@ -46,7 +46,7 @@ class MainActivity : AppCompatActivity(), OrderPlcaeClickListener {
 
                     saveLocationToSharedPreferences(location.latitude, location.longitude)
 
-                    mainViewModel.saveLocation(location.latitude, location.longitude)
+                   // mainViewModel.saveLocation(location.latitude, location.longitude)
 
                 }
             }

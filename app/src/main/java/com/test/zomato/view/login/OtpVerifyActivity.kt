@@ -21,7 +21,6 @@ class OtpVerifyActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityOtpVerifyBinding
     private val myHelper: MyHelper by lazy { MyHelper(this) }
-
     private lateinit var userViewModel: UserViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -63,14 +62,18 @@ class OtpVerifyActivity : AppCompatActivity() {
             bottomSheetFragment.show(supportFragmentManager, "loginBottomSheetFragment")
         }
 
-
-
         binding.otpIs.setOnCompleteOtpListener { otp ->
             binding.progressBar.visibility = View.VISIBLE
 
             if (otp == "000000") {
                 myHelper.hideKeyboard()
 
+                // Save the number in SharedPreferences
+                getSharedPreferences("AppPreferences", MODE_PRIVATE).edit()
+                    .putString("userNumber", number)
+                    .apply()
+
+                // Create a User object for the new user
                 val user = User(
                     imageUrl = null,
                     username = null,
@@ -81,43 +84,34 @@ class OtpVerifyActivity : AppCompatActivity() {
                     gender = null
                 )
 
-                getSharedPreferences("AppPreferences", MODE_PRIVATE).edit()
-                    .putString("userNumber", number)
-                    .apply()
 
-                // Call the ViewModel to check if the user exists or not
+                // Check if the user already exists in the database
                 userViewModel.getUserByPhoneNumber(numberIs)
 
-                // Observe the LiveData to check if the user exists
+                // Observe LiveData to check if the user exists
                 userViewModel.userLiveData.observe(this) { existingUser ->
                     binding.progressBar.visibility = View.GONE
 
                     if (existingUser != null) {
-                        // User already exists, continue with the existing user
-                        // You can redirect or proceed with existing data
+                        // User already exists, proceed with existing data
+                        // You can retain existing user data and skip saving
+
                         navigateToNextActivity()
                     } else {
-                        // User does not exist, save the new user
-                        userViewModel.saveUserData(user)
+                        // User does not exist, save the new user data
+                        userViewModel.saveUser(user)
                         navigateToNextActivity()
                     }
                 }
-
-
-
-
             } else {
                 binding.progressBar.visibility = View.GONE
                 Toast.makeText(this, "Enter Correct OTP", Toast.LENGTH_SHORT).show()
             }
-
         }
-
-
     }
 
     private fun navigateToNextActivity() {
-        if (!myHelper.isLocationEnable() || !myHelper.checkPermission()) {
+        if (!myHelper.isLocationEnable() || !myHelper.checkLocationPermission()) {
             Handler(Looper.getMainLooper()).postDelayed({
                 val intent = Intent(this, SetLocationPermissionActivity::class.java)
                 startActivity(intent)
@@ -133,7 +127,6 @@ class OtpVerifyActivity : AppCompatActivity() {
             }, 1000)
         }
     }
-
 
     private fun startResendOtpTimer() {
         val countdownTimer = object : CountDownTimer(10000, 1000) {
@@ -154,11 +147,9 @@ class OtpVerifyActivity : AppCompatActivity() {
                 binding.resendOtp.visibility = View.VISIBLE
                 binding.tryMoreOption.visibility = View.VISIBLE
                 binding.skip.visibility = View.VISIBLE
-
             }
         }
 
         countdownTimer.start()
     }
-
 }

@@ -2,15 +2,23 @@ package com.test.zomato.view.main.home
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
+import android.view.View
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
+import com.bumptech.glide.Glide
 import com.test.zomato.databinding.ActivityProfileBinding
+import com.test.zomato.utils.MyHelper
 import com.test.zomato.view.login.UserSignUpActivity
+import com.test.zomato.view.login.repository.UserViewModel
 import com.test.zomato.view.main.placeOrders.YourOrderActivity
 
 class ProfileActivity : AppCompatActivity() {
     private lateinit var binding: ActivityProfileBinding
+    private lateinit var userViewModel: UserViewModel
+    private val myHelper by lazy { MyHelper(this) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -18,21 +26,22 @@ class ProfileActivity : AppCompatActivity() {
         binding = ActivityProfileBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+
+        userViewModel = ViewModelProvider(this)[UserViewModel::class.java]
+
         binding.backButton.setOnClickListener {
             finish()
         }
+
+        fetchUserData(myHelper.numberIs())
+
+
 
         binding.joinGold.setOnClickListener {
             startActivity(Intent(this, JoinGoldActivity::class.java))
         }
 
-        binding.foodOrderSection.setOnClickListener {
-            Toast.makeText(this, "Food Order Section clicked", Toast.LENGTH_SHORT).show()
-        }
 
-        binding.foodOrderLayout.setOnClickListener {
-            Toast.makeText(this, "Food Order Layout clicked", Toast.LENGTH_SHORT).show()
-        }
 
         binding.yourOrder.setOnClickListener {
             val intent = Intent(this, YourOrderActivity::class.java)
@@ -42,6 +51,68 @@ class ProfileActivity : AppCompatActivity() {
         binding.yourProfile.setOnClickListener {
             val intent = Intent(this, UserProfileDetailsActivity::class.java)
             startActivity(intent)
+        }
+
+
+
+        binding.logout.setOnClickListener {
+
+            Toast.makeText(this, "Logout clicked", Toast.LENGTH_SHORT).show()
+
+            getSharedPreferences("AppPreferences", MODE_PRIVATE).edit().clear().apply()
+
+            val intent = Intent(this, UserSignUpActivity::class.java)
+            startActivity(intent)
+            finish()
+
+        }
+
+
+        showToastOnViewsClick()
+
+    }
+
+    override fun onRestart() {
+        super.onRestart()
+        fetchUserData(myHelper.numberIs())
+    }
+
+    private fun fetchUserData(userPhoneNumber: String) {
+        if (userPhoneNumber.isNotEmpty()) {
+            userViewModel.getUserByPhoneNumber(userPhoneNumber)
+
+            userViewModel.userLiveData.observe(this) { user ->
+
+                user?.let {
+                    Log.d("userDataProfile", "fetchUserData: $user")
+
+                    if (user.username.isNullOrEmpty()){
+                        binding.userName.text = "Hi, User"
+                    }else{
+                        binding.userName.text = user.username
+                    }
+
+                    if (!user.imageUrl.isNullOrEmpty()) {
+                        Glide.with(this).load(user.imageUrl).into(binding.userImage)
+                        binding.userFirstCharacter.visibility = View.GONE
+                        binding.userImage.visibility = View.VISIBLE
+                    } else {
+                        binding.userFirstCharacter.visibility = View.VISIBLE
+                        binding.userImage.visibility = View.GONE
+                    }
+                }
+            }
+        }
+    }
+
+
+    private fun showToastOnViewsClick() {
+        binding.foodOrderSection.setOnClickListener {
+            Toast.makeText(this, "Food Order Section clicked", Toast.LENGTH_SHORT).show()
+        }
+
+        binding.foodOrderLayout.setOnClickListener {
+            Toast.makeText(this, "Food Order Layout clicked", Toast.LENGTH_SHORT).show()
         }
 
         binding.favoriteOrder.setOnClickListener {
@@ -107,19 +178,6 @@ class ProfileActivity : AppCompatActivity() {
         binding.settings.setOnClickListener {
             Toast.makeText(this, "Settings clicked", Toast.LENGTH_SHORT).show()
         }
-
-        binding.logout.setOnClickListener {
-
-            Toast.makeText(this, "Logout clicked", Toast.LENGTH_SHORT).show()
-
-            getSharedPreferences("AppPreferences", MODE_PRIVATE).edit().clear().apply()
-
-            val intent = Intent(this,UserSignUpActivity::class.java)
-            startActivity(intent)
-            finish()
-
-        }
-
         binding.yourImpact.setOnClickListener {
             Toast.makeText(this, "Your Impact clicked", Toast.LENGTH_SHORT).show()
         }

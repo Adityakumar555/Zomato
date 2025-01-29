@@ -2,26 +2,25 @@ package com.test.zomato.view.main.home
 
 import android.content.Intent
 import android.location.Location
-import android.os.Build
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity.MODE_PRIVATE
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.bumptech.glide.Glide
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
-import com.hbb20.BuildConfig
 import com.test.zomato.R
 import com.test.zomato.databinding.FragmentHomeBinding
 import com.test.zomato.utils.EnableDeviceLocationBottomSheetFragment
 import com.test.zomato.utils.MyHelper
 import com.test.zomato.view.location.SelectAddressActivity
+import com.test.zomato.view.login.repository.UserViewModel
 import com.test.zomato.view.main.home.adapter.AllRestaurantsAdapter
 import com.test.zomato.view.main.home.adapter.ExploreItemAdapter
 import com.test.zomato.view.main.home.adapter.WhatsOnYourMindItemAdapter
@@ -40,7 +39,7 @@ class HomeFragment : Fragment(), RestaurantsClickListener {
     private lateinit var itemList: List<WhatsOnYourMindItemData>
     private lateinit var whatsOnYourMindItemAdapter: WhatsOnYourMindItemAdapter
     private val myHelper by lazy { MyHelper(requireActivity()) }
-
+    private lateinit var userViewModel:UserViewModel
     //  private val geocoder by lazy { Geocoder(requireContext(), Locale.getDefault()) }
     private lateinit var mainViewModel: MainViewModel
 
@@ -55,9 +54,13 @@ class HomeFragment : Fragment(), RestaurantsClickListener {
 
         myHelper.setStatusBarIconColor(requireActivity(), false)
         mainViewModel = ViewModelProvider(this)[MainViewModel::class.java]
+        userViewModel = ViewModelProvider(this)[UserViewModel::class.java]
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
 
+
         setLocationOnToolbar()
+        fetchUserData(myHelper.numberIs())
+
 
         binding.userLocation.setOnClickListener {
             val intent = Intent(context, SelectAddressActivity::class.java)
@@ -466,32 +469,67 @@ class HomeFragment : Fragment(), RestaurantsClickListener {
         })
 
 
+
         return binding.root
     }
 
 
+    override fun onStart() {
+        super.onStart()
+        fetchUserData(myHelper.numberIs())
+    }
+
+
+    private fun fetchUserData(userPhoneNumber: String) {
+        if (userPhoneNumber.isNotEmpty()) {
+            userViewModel.getUserByPhoneNumber(userPhoneNumber)
+
+            activity?.let {
+                userViewModel.userLiveData.observe(it) { user ->
+                    user?.let {
+                        Log.d("userDataProfile", "fetchUserData: $user")
+
+                        if (!user.imageUrl.isNullOrEmpty()) {
+                            Glide.with(this).load(user.imageUrl).into(binding.userImage)
+                            binding.userFirstCharacter.visibility = View.GONE
+                            binding.userImage.visibility = View.VISIBLE
+                        } else {
+                            binding.userFirstCharacter.visibility = View.VISIBLE
+                            binding.userImage.visibility = View.GONE
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     private fun setLocationOnToolbar() {
 
-        if (myHelper.checkPermission() && myHelper.isLocationEnable()){
+        if (myHelper.checkLocationPermission() && myHelper.isLocationEnable()){
             activity?.let {
                 fusedLocationClient.lastLocation.addOnCompleteListener(it) { task ->
                     val location: Location? = task.result
                     if (location != null) {
-
                         val locationData =
                             myHelper.extractAddressDetails(location.latitude, location.longitude)
                         binding.userBlockLocation.text = locationData?.block
                         binding.address.text = "${locationData?.locality},${locationData?.state}"
+                    }else{
+                        setLocationOnToolbarFromSharedprefrence()
                     }
                 }
             }
         }else{
-            val locationData =
-                myHelper.extractAddressDetails(myHelper.getLatitude(), myHelper.getLongitude())
-            binding.userBlockLocation.text = locationData?.block
-            binding.address.text = "${locationData?.locality},${locationData?.state}"
+            setLocationOnToolbarFromSharedprefrence()
         }
 
+    }
+
+    private fun setLocationOnToolbarFromSharedprefrence() {
+        val locationData =
+            myHelper.extractAddressDetails(myHelper.getLatitude(), myHelper.getLongitude())
+        binding.userBlockLocation.text = locationData?.block
+        binding.address.text = "${locationData?.locality},${locationData?.state}"
     }
 
     override fun onRestaurantsClick(restaurantDetails: RestaurantDetails) {
@@ -504,7 +542,7 @@ class HomeFragment : Fragment(), RestaurantsClickListener {
     override fun onResume() {
         super.onResume()
 
-        if (!myHelper.checkPermission() || !myHelper.isLocationEnable()) {
+        if (!myHelper.checkLocationPermission() || !myHelper.isLocationEnable()) {
             val enableDeviceLocationBottomSheetFragment = EnableDeviceLocationBottomSheetFragment()
             activity?.supportFragmentManager?.let {
                 enableDeviceLocationBottomSheetFragment.show(
