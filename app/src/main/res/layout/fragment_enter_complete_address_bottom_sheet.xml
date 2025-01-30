@@ -92,6 +92,7 @@
                             android:layout_below="@id/text1"
                             android:layout_width="wrap_content"
                             android:layout_marginEnd="6dp"
+                            android:layout_marginBottom="10dp"
                             android:layout_marginStart="18dp"
                             android:layout_height="wrap_content">
 
@@ -133,10 +134,10 @@
                         </RelativeLayout>
 
                         <RelativeLayout
+                            android:id="@+id/confirmReceiverDetails"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_below="@id/receiver_details"
-                            android:layout_marginTop="4dp"
                             android:layout_marginBottom="10dp">
 
                             <ImageView
@@ -162,7 +163,6 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:fontFamily="@font/metropolis_medium"
-                                    android:text="Aditya Kumar,"
                                     android:textColor="#191919"
                                     android:textSize="14sp" />
 
@@ -172,7 +172,6 @@
                                     android:layout_height="wrap_content"
                                     android:layout_marginStart="4dp"
                                     android:fontFamily="@font/metropolis_bold"
-                                    android:text="+91-8979116063"
                                     android:textColor="#191919" />
 
 
@@ -255,7 +254,6 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/metropolis_medium"
-                                android:text="Aditya Kumar"
                                 android:hint="Receiver's name"
                                 android:textColorHint="@android:color/darker_gray"
                                 />
@@ -282,7 +280,6 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/metropolis_medium"
-                                android:text="8979116063"
                                 android:hint="Receiver's Number"
                                 android:maxLength="10"
                                 android:inputType="number"
@@ -792,7 +789,7 @@
 
 
         <Button
-            android:id="@+id/addAddressInDb"
+            android:id="@+id/confirmAddress"
             style="@style/Widget.MaterialComponents.Button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

@@ -87,6 +87,7 @@ class HomeFragment : Fragment(), RestaurantsClickListener {
             binding.vegAndNonVegMode.visibility = View.VISIBLE
             binding.menuIcon.visibility = View.GONE
 
+            // merge local saved address with current login user after delete local address from roomDB
             mainViewModel.getAllAddresses("")
             activity?.let {
                 mainViewModel.addresses.observe(it) { addresses ->
@@ -95,11 +96,8 @@ class HomeFragment : Fragment(), RestaurantsClickListener {
                             addresses.map { it.copy(currentUserNumber = myHelper.numberIs()) }
                         mainViewModel.saveAddressesForUser(localSavedAddress)
                     }
-
                 }
             }
-
-
         }
 
         //Toast.makeText(requireActivity(), "${myHelper.numberIs()}", Toast.LENGTH_SHORT).show()
@@ -556,7 +554,7 @@ class HomeFragment : Fragment(), RestaurantsClickListener {
                 }
             }
 
-            mainViewModel.getAllAddresses(userPhoneNumber)
+          //  mainViewModel.getAllAddresses(userPhoneNumber)
 
         }
 

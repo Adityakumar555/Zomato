@@ -28,7 +28,7 @@ class EnterCompleteAddressBottomSheetFragment : BottomSheetDialogFragment() {
     private lateinit var binding: FragmentEnterCompleteAddressBottomSheetBinding
     private lateinit var mainViewModel: MainViewModel
     private var selectedAddressType: String = "Home" // Default to "Home"
-    private var addressId: Int? = null // Holds the address ID when editing
+    private var addressId: Int? = null
     private val myHelper by lazy { activity?.let { MyHelper(it) } }
     private lateinit var userViewModel: UserViewModel
 
@@ -80,16 +80,16 @@ class EnterCompleteAddressBottomSheetFragment : BottomSheetDialogFragment() {
             binding.text5.visibility = View.GONE
             binding.areaSectorLocationEditTextLayout.visibility = View.VISIBLE
 
-            binding.addAddressInDb.text = "Save address"
+            binding.confirmAddress.text = "Save address"
 
-            binding.addAddressInDb.setOnClickListener {
+            binding.confirmAddress.setOnClickListener {
                 val selectedLocation = binding.areaSectorLocationEditText.text.toString()
                 val houseAddress = binding.flatHouseNoFloorBuilding.text.toString()
                 val nearbyLandmark = binding.emailInput.text.toString()
 
 
                 if (selectedAddress.isNullOrEmpty()) {
-                    Toast.makeText(activity, "Enter correct number.", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(activity, "Enter correct address.", Toast.LENGTH_SHORT).show()
                     return@setOnClickListener
                 } else if (houseAddress.isNullOrEmpty()) {
                     binding.flatHouseNoFloorBuilding.requestFocus()
@@ -166,7 +166,7 @@ class EnterCompleteAddressBottomSheetFragment : BottomSheetDialogFragment() {
                 binding.bottomBtnCard2.visibility = View.GONE
             }
 
-            binding.addAddressInDb.setOnClickListener {
+            binding.confirmAddress.setOnClickListener {
 
                 val receiverName = binding.receiverName.text.toString()
                 val receiverNumber = binding.receiverNumber.text.toString()
@@ -175,7 +175,7 @@ class EnterCompleteAddressBottomSheetFragment : BottomSheetDialogFragment() {
                 val nearbyLandmark = binding.emailInput.text.toString()
 
 
-                if (receiverNumber.length != 10) {
+                if (binding.receiverDetails.visibility == View.VISIBLE && receiverNumber.length != 10) {
                     Toast.makeText(activity, "Enter correct number.", Toast.LENGTH_SHORT).show()
                     return@setOnClickListener
                 } else if (houseAddress.isNullOrEmpty()) {
@@ -193,8 +193,17 @@ class EnterCompleteAddressBottomSheetFragment : BottomSheetDialogFragment() {
                     binding.confirmLocationText.text = "Confirm your Address"
                     binding.deliveryAt.text = "Delivery at $selectedAddressType"
                     binding.address.text = "$houseAddress, $selectedLocation, $nearbyLandmark"
-                    binding.confirmUserName.text = "${receiverName},"
-                    binding.confirmUserNumber.text = receiverNumber
+
+
+                    if (binding.userDetailsCard.visibility == View.VISIBLE || binding.receiverDetails.visibility == View.VISIBLE) {
+                        binding.confirmReceiverDetails.visibility = View.VISIBLE
+                        binding.confirmUserName.text = "$receiverName,"
+                        binding.confirmUserNumber.text = receiverNumber
+                    } else {
+                        binding.confirmReceiverDetails.visibility = View.GONE
+                    }
+
+
                 }
             }
 

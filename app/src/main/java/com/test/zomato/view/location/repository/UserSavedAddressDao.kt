@@ -26,7 +26,7 @@ interface UserSavedAddressDao {
     @Query("DELETE FROM user_saved_address WHERE currentUserNumber = :currentUserNumber")
     suspend fun deleteAddressesWithUserNumber(currentUserNumber: String)
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertMultipleAddresses(addresses: List<UserSavedAddress>)
 
 }

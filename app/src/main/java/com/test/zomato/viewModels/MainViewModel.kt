@@ -46,7 +46,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    // LiveData to hold list of saved addresses
     private val _addresses = MutableLiveData<List<UserSavedAddress>>()
     val addresses: LiveData<List<UserSavedAddress>> = _addresses
 
@@ -92,7 +91,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
 
 
-
     fun updateAddress(
         addressId: Int,
         receiverName: String,
@@ -105,7 +103,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     ) {
         viewModelScope.launch {
             val address = UserSavedAddress(
-                id = addressId, // Make sure to pass the id for update
+                id = addressId,
                 receiverName = receiverName,
                 receiverNumber = receiverNumber,
                 currentUserNumber = currentUserNumber,
@@ -113,7 +111,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 selectedLocation = selectedLocation,
                 houseAddress = houseAddress,
                 nearbyLandmark = nearbyLandmark,
-                addressSelected = false // Resetting the selection flag for update
+                addressSelected = false
             )
             userSavedAddressRepository.updateAddress(address)
         }
