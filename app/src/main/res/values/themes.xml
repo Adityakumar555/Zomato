@@ -9,11 +9,10 @@
         <item name="android:windowLightStatusBar">true</item>
 
 
-<!--
-        <item name="android:fitsSystemWindows">true</item>
--->
 
-
+        <!--
+                <item name="android:fitsSystemWindows">true</item>
+        -->
 
     </style>
 
@@ -37,14 +36,13 @@
     <!-- Custom style for TabLayout -->
     <style name="CustomTabLayoutStyle" parent="Widget.MaterialComponents.TabLayout">
         <!-- Tab Indicator -->
-        <item name="tabIndicator">@drawable/tab_indicator_top</item> <!-- Use the custom drawable for the indicator -->
-        <item name="tabIndicatorColor">#EF0C4C</item> <!-- Tab indicator color -->
-        <item name="tabIndicatorHeight">4dp</item>  <!-- Height of the indicator -->
-        <item name="tabSelectedTextColor">#EF0C4C</item> <!-- Selected tab text color -->
-        <item name="tabTextColor">@color/black</item> <!-- Unselected tab text color -->
+        <item name="tabIndicator">@drawable/tab_indicator_top</item>
+        <item name="tabIndicatorColor">#EF0C4C</item>
+        <item name="tabIndicatorHeight">4dp</item>
+        <item name="tabSelectedTextColor">#EF0C4C</item>
+        <item name="tabTextColor">@color/black</item>
 
-        <!-- Optional tab style settings -->
-        <item name="tabMode">fixed</item> <!-- Tab mode (scrollable or fixed) -->
+        <item name="tabMode">fixed</item>
     </style>
 
 

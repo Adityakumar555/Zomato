@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:background="@drawable/top_left_right_rounded_corners"
     tools:context=".view.location.EnterCompleteAddressBottomSheetFragment">
 
@@ -30,6 +30,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/close_button"
+        android:layout_above="@+id/bottom_btn_card"
         android:fillViewport="true">
 
         <RelativeLayout
@@ -396,6 +397,7 @@
                     app:cardCornerRadius="16dp">
 
                     <RelativeLayout
+                        android:layout_marginBottom="40dp"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
 
@@ -686,7 +688,7 @@
                         <com.google.android.material.textfield.TextInputLayout
                             android:id="@+id/editTextLayoutflatHouseNo"
                             android:layout_width="match_parent"
-                            android:layout_height="54dp"
+                            android:layout_height="wrap_content"
                             android:layout_below="@id/text5"
                             android:layout_marginStart="18dp"
                             android:layout_marginTop="12dp"
@@ -704,7 +706,6 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/metropolis_medium"
-                                android:text="New Ashok Nagar"
                                 android:hint="Flat / House no / Floor / Building *"
                                 android:inputType="textEmailAddress"
                                 android:textColorHint="@android:color/darker_gray"
@@ -713,12 +714,12 @@
 
                         <com.google.android.material.textfield.TextInputLayout
                             android:layout_width="match_parent"
-                            android:layout_height="54dp"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/nearbyLandmarkLayout"
                             android:layout_below="@id/editTextLayoutflatHouseNo"
                             android:layout_marginStart="18dp"
                             android:layout_marginTop="14dp"
                             android:layout_marginEnd="18dp"
-                            android:layout_marginBottom="40dp"
                             app:boxBackgroundMode="outline"
                             app:boxCornerRadiusBottomEnd="8dp"
                             app:boxCornerRadiusBottomStart="8dp"
@@ -733,6 +734,36 @@
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/metropolis_medium"
                                 android:hint="Nearby landmark (optional)"
+                                android:inputType="textEmailAddress"
+                                android:textColorHint="@android:color/darker_gray"
+                                android:textSize="15sp" />
+                        </com.google.android.material.textfield.TextInputLayout>
+
+
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/area_sector_location_editTextLayout"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@id/nearbyLandmarkLayout"
+                            android:layout_marginStart="18dp"
+                            android:layout_marginTop="12dp"
+                            android:visibility="gone"
+                            android:layout_marginEnd="18dp"
+                            app:boxBackgroundMode="outline"
+                            app:boxCornerRadiusBottomEnd="8dp"
+                            app:boxCornerRadiusBottomStart="8dp"
+                            app:boxCornerRadiusTopEnd="8dp"
+                            app:boxCornerRadiusTopStart="8dp"
+                            app:boxStrokeColor="@android:color/black"
+                            app:endIconMode="clear_text">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/area_sector_location_editText"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/metropolis_medium"
+                                android:hint="Area / Sector / Locality *"
                                 android:inputType="textEmailAddress"
                                 android:textColorHint="@android:color/darker_gray"
                                 android:textSize="15sp" />
@@ -777,7 +808,7 @@
             android:textColor="@color/white"
             android:textSize="16sp"
             android:visibility="visible"
-            app:backgroundTint="#B0B4C0" />
+            app:backgroundTint="#F04F5F" />
     </androidx.cardview.widget.CardView>
 
 

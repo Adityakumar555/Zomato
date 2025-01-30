@@ -9,8 +9,11 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
+import com.test.zomato.R
 import com.test.zomato.databinding.ActivityProfileBinding
+import com.test.zomato.utils.AppSharedPreferences
 import com.test.zomato.utils.MyHelper
+import com.test.zomato.view.location.MyAddressesBookActivity
 import com.test.zomato.view.login.UserSignUpActivity
 import com.test.zomato.view.login.repository.UserViewModel
 import com.test.zomato.view.main.placeOrders.YourOrderActivity
@@ -35,6 +38,32 @@ class ProfileActivity : AppCompatActivity() {
 
         fetchUserData(myHelper.numberIs())
 
+        val appPreferences = AppSharedPreferences(this)
+        val isSkipBtnClick = appPreferences.getBoolean("skipBtnClick")
+
+        if (isSkipBtnClick) {
+
+            binding.profileViews.visibility = View.GONE
+            binding.diningAndExperiencesSections.visibility = View.GONE
+            binding.feedingIndiaSection.visibility = View.GONE
+            binding.logout.visibility = View.GONE
+            binding.userDetailsCard.visibility = View.GONE
+            binding.loginProfileCard.visibility = View.VISIBLE
+
+            binding.loginProfileCard.setOnClickListener {
+                startActivity(Intent(this, UserSignUpActivity::class.java))
+            }
+
+
+        } else {
+            binding.userDetailsCard.visibility = View.VISIBLE
+            binding.loginProfileCard.visibility = View.GONE
+            binding.profileViews.visibility = View.VISIBLE
+            binding.diningAndExperiencesSections.visibility = View.VISIBLE
+            binding.feedingIndiaSection.visibility = View.VISIBLE
+            binding.logout.visibility = View.VISIBLE
+
+        }
 
 
         binding.joinGold.setOnClickListener {
@@ -53,13 +82,19 @@ class ProfileActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
+        binding.addressBook.setOnClickListener {
+            val intent = Intent(this, MyAddressesBookActivity::class.java)
+            startActivity(intent)
+            overridePendingTransition(R.anim.slide_in_bottom, R.anim.slide_out_top)
+        }
 
 
         binding.logout.setOnClickListener {
 
             Toast.makeText(this, "Logout clicked", Toast.LENGTH_SHORT).show()
 
-            getSharedPreferences("AppPreferences", MODE_PRIVATE).edit().clear().apply()
+            val appSharedPreferences = AppSharedPreferences(this)
+            appSharedPreferences.clearAllData()
 
             val intent = Intent(this, UserSignUpActivity::class.java)
             startActivity(intent)
@@ -86,9 +121,9 @@ class ProfileActivity : AppCompatActivity() {
                 user?.let {
                     Log.d("userDataProfile", "fetchUserData: $user")
 
-                    if (user.username.isNullOrEmpty()){
+                    if (user.username.isNullOrEmpty()) {
                         binding.userName.text = "Hi, User"
-                    }else{
+                    } else {
                         binding.userName.text = user.username
                     }
 
@@ -119,17 +154,6 @@ class ProfileActivity : AppCompatActivity() {
             Toast.makeText(this, "Favorite Orders clicked", Toast.LENGTH_SHORT).show()
         }
 
-        binding.manageRecommendations.setOnClickListener {
-            Toast.makeText(this, "Manage Recommendations clicked", Toast.LENGTH_SHORT).show()
-        }
-
-        binding.orderOnTrain.setOnClickListener {
-            Toast.makeText(this, "Order on Train clicked", Toast.LENGTH_SHORT).show()
-        }
-
-        binding.addressBook.setOnClickListener {
-            Toast.makeText(this, "Address Book clicked", Toast.LENGTH_SHORT).show()
-        }
 
         binding.hiddenRestaurants.setOnClickListener {
             Toast.makeText(this, "Hidden Restaurants clicked", Toast.LENGTH_SHORT).show()

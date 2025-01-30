@@ -5,6 +5,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import com.test.zomato.utils.RoomDatabaseHelper
 import com.test.zomato.view.main.home.models.FoodItem
 import com.test.zomato.view.main.home.models.orderModels.FoodItemInOrder
 import com.test.zomato.view.main.home.models.orderModels.OrderDetails
@@ -14,7 +15,7 @@ import kotlinx.coroutines.launch
 class RoomDbViewModel(application: Application) : AndroidViewModel(application) {
 
     private val roomDbRepository: RoomDbRepository by lazy {
-        RoomDbRepository(CartDatabase.getInstance(application)!!.cartDao())
+        RoomDbRepository(RoomDatabaseHelper.getInstance(application)!!.cartDao())
     }
 
     private val setFoodItemsInList = MutableLiveData<List<FoodItem>>()

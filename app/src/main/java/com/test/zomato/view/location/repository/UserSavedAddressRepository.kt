@@ -8,7 +8,24 @@ class UserSavedAddressRepository(private val userSavedAddressDao: UserSavedAddre
         userSavedAddressDao.insertAddress(userSavedAddress)
     }
 
-    suspend fun getAllAddresses(): List<UserSavedAddress> {
-        return userSavedAddressDao.getAllAddresses()
+    suspend fun getAllAddresses(numberIs: String): List<UserSavedAddress> {
+        return userSavedAddressDao.getAllAddresses(numberIs)
     }
+
+    suspend fun deleteAddress(userSavedAddress: UserSavedAddress){
+        return userSavedAddressDao.deleteAddress(userSavedAddress)
+    }
+
+    suspend fun updateAddress(userSavedAddress: UserSavedAddress){
+        return userSavedAddressDao.updateAddress(userSavedAddress)
+    }
+
+    suspend fun deleteAddressesWithUserNumber(currentUserNumber: String) {
+        userSavedAddressDao.deleteAddressesWithUserNumber(currentUserNumber)
+    }
+
+    suspend fun saveMultipleAddresses(addresses: List<UserSavedAddress>) {
+        userSavedAddressDao.insertMultipleAddresses(addresses)
+    }
+
 }

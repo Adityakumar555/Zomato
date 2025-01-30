@@ -11,6 +11,7 @@ import com.google.android.gms.location.LocationServices
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.test.zomato.R
 import com.test.zomato.databinding.ActivityMainBinding
+import com.test.zomato.utils.AppSharedPreferences
 import com.test.zomato.utils.MyHelper
 import com.test.zomato.view.main.home.DiningFragment
 import com.test.zomato.view.main.home.HomeFragment
@@ -27,12 +28,16 @@ class MainActivity : AppCompatActivity(), OrderPlcaeClickListener {
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var mainViewModel: MainViewModel
     private lateinit var binding: ActivityMainBinding
+    private val appSharedPreferences by lazy { AppSharedPreferences(this) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        appSharedPreferences.saveBoolean("VisitedMainActivity", true)
+
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         mainViewModel = ViewModelProvider(this)[MainViewModel::class.java]
@@ -52,11 +57,6 @@ class MainActivity : AppCompatActivity(), OrderPlcaeClickListener {
             }
         }
 
-
-
-        getSharedPreferences("AppPreferences", MODE_PRIVATE).edit()
-            .putBoolean("VisitedMainActivity", true)
-            .apply()
 
         // Initially load the HomeFragment
         loadFragment(HomeFragment())
@@ -123,11 +123,8 @@ class MainActivity : AppCompatActivity(), OrderPlcaeClickListener {
 
     // Function to save location (latitude and longitude) to SharedPreferences
     private fun saveLocationToSharedPreferences(latitude: Double, longitude: Double) {
-        val sharedPreferences = getSharedPreferences("AppPreferences", MODE_PRIVATE)
-        val editor = sharedPreferences.edit()
-        editor.putFloat("Latitude", latitude.toFloat())
-        editor.putFloat("Longitude", longitude.toFloat())
-        editor.apply()
+        appSharedPreferences.saveFloat("Latitude", latitude.toFloat())
+        appSharedPreferences.saveFloat("Longitude", longitude.toFloat())
     }
 
     private fun loadFragment(fragment: Fragment) {
@@ -148,7 +145,6 @@ class MainActivity : AppCompatActivity(), OrderPlcaeClickListener {
     override fun onBackPressed() {
         super.onBackPressed()
         finishAffinity();
-        finish()
     }
 
 }

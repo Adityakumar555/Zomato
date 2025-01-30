@@ -14,9 +14,10 @@ import androidx.lifecycle.ViewModelProvider
 import com.github.dhaval2404.imagepicker.ImagePicker
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.test.zomato.databinding.FragmentAddAndUpdateProfilePictureBottomSheetBinding
+import com.test.zomato.utils.RemoveProfilePictureDialog
 import com.test.zomato.view.login.repository.UserViewModel
 import com.test.zomato.view.main.home.UserProfileDetailsActivity
-import com.test.zomato.view.main.home.interfaces.UserProfileImageChangeListener
+import com.test.zomato.view.main.home.interfaces.ClickEventListener
 
 
 class AddAndUpdateProfilePictureBottomSheetFragment : BottomSheetDialogFragment() {
@@ -25,7 +26,7 @@ class AddAndUpdateProfilePictureBottomSheetFragment : BottomSheetDialogFragment(
     private var profileImage: String? = null
     private var number: String? = null
 
-    private var listener : UserProfileImageChangeListener? = null
+    private var listener : ClickEventListener? = null
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -55,17 +56,21 @@ class AddAndUpdateProfilePictureBottomSheetFragment : BottomSheetDialogFragment(
 
         // Handle delete photo button click
         binding.deletePhoto.setOnClickListener {
-            number?.let { userViewModel.getUserByPhoneNumber(it) }
+
+            val dialog = RemoveProfilePictureDialog()
+            dialog.show(requireActivity().supportFragmentManager, "RemoveProfilePictureDialog")
+
+            /*number?.let { userViewModel.getUserByPhoneNumber(it) }
 
             userViewModel.userLiveData.observe(viewLifecycleOwner, Observer { currentUser ->
                 currentUser?.let {
                     // Update the imageUrl field to null
                     userViewModel.updateUserProfile("", it.id)
                     Toast.makeText(requireActivity(), "Profile photo deleted", Toast.LENGTH_SHORT).show()
-                    listener?.imageChangeClick()
+                    listener?.clickListener()
                     dismiss()
                 }
-            })
+            })*/
             dismiss()
         }
 
@@ -89,7 +94,7 @@ class AddAndUpdateProfilePictureBottomSheetFragment : BottomSheetDialogFragment(
                     profileImage?.let {
                         userViewModel.updateUserProfile(it, currentUser.id)
                         Toast.makeText(requireActivity(), "Profile updated successfully", Toast.LENGTH_SHORT).show()
-                        listener?.imageChangeClick()
+                        listener?.uploadProfilePhoto()
                         dismiss()
                     }
                 }

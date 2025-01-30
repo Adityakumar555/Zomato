@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.test.zomato.R
 import com.test.zomato.databinding.FragmentDiningBinding
+import com.test.zomato.utils.AppSharedPreferences
 import com.test.zomato.utils.MyHelper
 import com.test.zomato.view.location.SelectAddressActivity
 import com.test.zomato.view.login.repository.UserViewModel
@@ -43,6 +44,23 @@ class DiningFragment : Fragment() {
 
         fetchUserData(myHelper.numberIs())
 
+
+        val appPreferences = activity?.let { AppSharedPreferences(it) }
+        val isSkipBtnClick = appPreferences?.getBoolean("skipBtnClick")
+
+        if (isSkipBtnClick == true) {
+            binding.profile.visibility = View.GONE
+            binding.menuIcon.visibility = View.VISIBLE
+
+            binding.menuIcon.setOnClickListener {
+                val intent = Intent(context, ProfileActivity::class.java)
+                activity?.startActivity(intent)
+            }
+
+        }else{
+            binding.profile.visibility = View.VISIBLE
+            binding.menuIcon.visibility = View.GONE
+        }
 
         val dummyBarList = listOf(
             BarData(

@@ -8,10 +8,12 @@ data class UserSavedAddress(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val receiverName: String,
     val receiverNumber: String,
+    val currentUserNumber: String,
     val saveAddressAs: String, // Home, Work, etc.
     val selectedLocation: String,
     val houseAddress: String,
-    val nearbyLandmark: String
+    val nearbyLandmark: String,
+    val addressSelected: Boolean = false
 )
 
 

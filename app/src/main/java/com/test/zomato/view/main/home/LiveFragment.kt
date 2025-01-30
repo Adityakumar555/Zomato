@@ -12,6 +12,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import com.test.zomato.R
 import com.test.zomato.databinding.FragmentLiveBinding
+import com.test.zomato.utils.AppSharedPreferences
 import com.test.zomato.utils.MyHelper
 import com.test.zomato.view.login.repository.UserViewModel
 
@@ -30,6 +31,24 @@ class LiveFragment : Fragment() {
 
         myHelper.setStatusBarIconColor(requireActivity(),true)
         userViewModel = ViewModelProvider(this)[UserViewModel::class.java]
+
+
+        val appPreferences = activity?.let { AppSharedPreferences(it) }
+        val isSkipBtnClick = appPreferences?.getBoolean("skipBtnClick")
+
+        if (isSkipBtnClick == true) {
+            binding.profile.visibility = View.GONE
+            binding.menuIcon.visibility = View.VISIBLE
+
+            binding.menuIcon.setOnClickListener {
+                val intent = Intent(context, ProfileActivity::class.java)
+                activity?.startActivity(intent)
+            }
+
+        }else{
+            binding.profile.visibility = View.VISIBLE
+            binding.menuIcon.visibility = View.GONE
+        }
 
 
         val videoUri = Uri.parse("android.resource://" + requireContext().packageName + "/" + R.raw.zomato_event)

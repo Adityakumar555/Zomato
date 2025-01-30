@@ -84,6 +84,7 @@
             android:id="@+id/enter_location_manually"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:visibility="gone"
             android:background="@drawable/green_outline_bg"
             android:fontFamily="@font/metropolis_medium"
             android:text="Enter Your Location Manually"

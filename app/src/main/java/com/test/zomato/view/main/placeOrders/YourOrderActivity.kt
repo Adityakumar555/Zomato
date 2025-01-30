@@ -1,5 +1,6 @@
 package com.test.zomato.view.main.placeOrders
 
+import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import androidx.activity.enableEdgeToEdge
@@ -18,9 +19,11 @@ class YourOrderActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+       // enableEdgeToEdge()
         binding = ActivityYourOrderBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        window.statusBarColor = Color.parseColor("#F3F4FA")
 
         roomDbViewModel = ViewModelProvider(this)[RoomDbViewModel::class.java]
 

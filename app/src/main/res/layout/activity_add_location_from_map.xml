@@ -220,6 +220,7 @@
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/metropolis_bold"
                     android:text="CHANGE"
+                    android:visibility="gone"
                     android:layout_alignParentEnd="true"
                     android:layout_marginTop="2dp"
                     android:layout_marginEnd="16dp"

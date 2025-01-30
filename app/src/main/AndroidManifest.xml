@@ -19,6 +19,9 @@
         android:theme="@style/Theme.Zomato"
         tools:targetApi="31">
         <activity
+            android:name=".view.location.MyAddressesBookActivity"
+            android:exported="false" />
+        <activity
             android:name=".view.location.AddLocationFromMapActivity"
             android:exported="false" />
         <activity

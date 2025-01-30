@@ -13,6 +13,7 @@ import android.widget.DatePicker
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Observer
 import com.bumptech.glide.Glide
 import com.google.android.material.textfield.TextInputEditText
 import com.test.zomato.R
@@ -21,16 +22,15 @@ import com.test.zomato.utils.MyHelper
 import com.test.zomato.view.login.repository.UserViewModel
 import com.test.zomato.view.login.userData.User
 import com.test.zomato.view.main.home.bottomSheets.AddAndUpdateProfilePictureBottomSheetFragment
-import com.test.zomato.view.main.home.interfaces.UserProfileImageChangeListener
+import com.test.zomato.view.main.home.interfaces.ClickEventListener
 import java.util.Calendar
 import java.util.Locale
 
-class UserProfileDetailsActivity : AppCompatActivity(), UserProfileImageChangeListener {
+class UserProfileDetailsActivity : AppCompatActivity(), ClickEventListener {
 
     private lateinit var binding: ActivityUserProfileDetailsBinding
     private val userViewModel: UserViewModel by viewModels()
     private val myHelper by lazy { MyHelper(this) }
-
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -84,19 +84,23 @@ class UserProfileDetailsActivity : AppCompatActivity(), UserProfileImageChangeLi
             if (name.isNotEmpty() && mobile.isNotEmpty()) {
 
 
-
                 if (!email.isNullOrEmpty() && !isValidEmail(email)) {
                     Toast.makeText(this, "Please enter a valid email", Toast.LENGTH_SHORT).show()
                     return@setOnClickListener
                 }
 
                 if (!dob.isNullOrEmpty() && !isValidDate(dob)) {
-                    Toast.makeText(this, "Please enter a valid date of birth", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "Please enter a valid date of birth", Toast.LENGTH_SHORT)
+                        .show()
                     return@setOnClickListener
                 }
 
                 if (!anniversary.isNullOrEmpty() && !isValidDate(anniversary)) {
-                    Toast.makeText(this, "Please enter a valid anniversary date", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        this,
+                        "Please enter a valid anniversary date",
+                        Toast.LENGTH_SHORT
+                    ).show()
                     return@setOnClickListener
                 }
 
@@ -115,7 +119,8 @@ class UserProfileDetailsActivity : AppCompatActivity(), UserProfileImageChangeLi
                         user.id = existingUser.id
                         user.imageUrl = existingUser.imageUrl
                         userViewModel.updateUser(user)
-                        Toast.makeText(this, "Profile updated successfully", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, "Profile updated successfully", Toast.LENGTH_SHORT)
+                            .show()
                     }
                 }
             } else {
@@ -124,7 +129,8 @@ class UserProfileDetailsActivity : AppCompatActivity(), UserProfileImageChangeLi
         }
 
         binding.profileImageLayout.setOnClickListener {
-            val addAndUpdateProfilePictureBottomSheetFragment = AddAndUpdateProfilePictureBottomSheetFragment()
+            val addAndUpdateProfilePictureBottomSheetFragment =
+                AddAndUpdateProfilePictureBottomSheetFragment()
             val bundle = Bundle()
             bundle.putString("number", myHelper.numberIs())
             addAndUpdateProfilePictureBottomSheetFragment.arguments = bundle
@@ -170,16 +176,22 @@ class UserProfileDetailsActivity : AppCompatActivity(), UserProfileImageChangeLi
         val day = calendar.get(Calendar.DAY_OF_MONTH)
 
         val datePickerDialog = DatePickerDialog(
-            this, R.style.DialogTheme, { _: DatePicker, selectedYear: Int, selectedMonth: Int, selectedDay: Int ->
+            this,
+            R.style.DialogTheme,
+            { _: DatePicker, selectedYear: Int, selectedMonth: Int, selectedDay: Int ->
                 val formattedDate = "${selectedDay}-${selectedMonth + 1}-${selectedYear}"
                 id.setText(formattedDate)
             },
-            year, month, day
+            year,
+            month,
+            day
         )
 
         datePickerDialog.show()
-        datePickerDialog.getButton(DatePickerDialog.BUTTON_NEGATIVE).setTextColor(resources.getColor(R.color.colorPrimary))
-        datePickerDialog.getButton(DatePickerDialog.BUTTON_POSITIVE).setTextColor(resources.getColor(R.color.colorPrimary))
+        datePickerDialog.getButton(DatePickerDialog.BUTTON_NEGATIVE)
+            .setTextColor(resources.getColor(R.color.colorPrimary))
+        datePickerDialog.getButton(DatePickerDialog.BUTTON_POSITIVE)
+            .setTextColor(resources.getColor(R.color.colorPrimary))
     }
 
     private fun isValidEmail(email: String): Boolean {
@@ -197,8 +209,23 @@ class UserProfileDetailsActivity : AppCompatActivity(), UserProfileImageChangeLi
         }
     }
 
-    override fun imageChangeClick() {
+
+    override fun uploadProfilePhoto() {
         fetchUserData(myHelper.numberIs())
-     //   recreate()
     }
+
+    override fun deleteProfilePhoto() {
+        myHelper.numberIs().let { userViewModel.getUserByPhoneNumber(it) }
+
+        userViewModel.userLiveData.observe(this, Observer { currentUser ->
+            currentUser?.let {
+                // Update the imageUrl field to null
+                userViewModel.updateUserProfile("", it.id)
+                Toast.makeText(this, "Profile photo deleted", Toast.LENGTH_SHORT).show()
+
+            }
+        })
+        fetchUserData(myHelper.numberIs())
+    }
+
 }

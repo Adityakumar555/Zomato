@@ -11,6 +11,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.test.zomato.databinding.ActivityOtpVerifyBinding
+import com.test.zomato.utils.AppSharedPreferences
 import com.test.zomato.utils.MyHelper
 import com.test.zomato.view.location.SetLocationPermissionActivity
 import com.test.zomato.view.login.repository.UserViewModel
@@ -51,6 +52,9 @@ class OtpVerifyActivity : AppCompatActivity() {
         }
 
         binding.skip.setOnClickListener {
+            val appPreferences = AppSharedPreferences(this)
+            appPreferences.saveBoolean("skipBtnClick",true)
+
             val intent = Intent(this, SetLocationPermissionActivity::class.java)
             startActivity(intent)
             finish()
@@ -68,10 +72,11 @@ class OtpVerifyActivity : AppCompatActivity() {
             if (otp == "000000") {
                 myHelper.hideKeyboard()
 
-                // Save the number in SharedPreferences
-                getSharedPreferences("AppPreferences", MODE_PRIVATE).edit()
-                    .putString("userNumber", number)
-                    .apply()
+                val appPreferences = AppSharedPreferences(this)
+                if (number != null) {
+                    appPreferences.saveString("userNumber", number)
+                }
+
 
                 // Create a User object for the new user
                 val user = User(
@@ -86,7 +91,9 @@ class OtpVerifyActivity : AppCompatActivity() {
 
 
                 // Check if the user already exists in the database
-                userViewModel.getUserByPhoneNumber(numberIs)
+                if (number != null) {
+                    userViewModel.getUserByPhoneNumber(number)
+                }
 
                 // Observe LiveData to check if the user exists
                 userViewModel.userLiveData.observe(this) { existingUser ->
@@ -94,8 +101,6 @@ class OtpVerifyActivity : AppCompatActivity() {
 
                     if (existingUser != null) {
                         // User already exists, proceed with existing data
-                        // You can retain existing user data and skip saving
-
                         navigateToNextActivity()
                     } else {
                         // User does not exist, save the new user data

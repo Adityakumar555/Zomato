@@ -1,5 +1,6 @@
 package com.test.zomato.view.location
 
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.location.Geocoder
@@ -22,10 +23,14 @@ import com.google.android.gms.maps.model.MarkerOptions
 import com.test.zomato.R
 import com.test.zomato.databinding.ActivityAddLocationFromMapBinding
 import com.test.zomato.utils.MyHelper
+import com.test.zomato.view.location.interfaces.SavedAddressClickListener
+import com.test.zomato.view.main.MainActivity
+import com.test.zomato.view.main.home.interfaces.ClickEventListener
 import java.io.IOException
 import java.util.Locale
 
-class AddLocationFromMapActivity : AppCompatActivity(), OnMapReadyCallback {
+class AddLocationFromMapActivity : AppCompatActivity(), OnMapReadyCallback,
+    SavedAddressClickListener {
 
     private lateinit var googleMap: GoogleMap
     private lateinit var binding: ActivityAddLocationFromMapBinding
@@ -34,12 +39,18 @@ class AddLocationFromMapActivity : AppCompatActivity(), OnMapReadyCallback {
     private var selectedAddress: String? = null
     private val myHelper by lazy { MyHelper(this) }
     private lateinit var resultLauncher: ActivityResultLauncher<IntentSenderRequest>
-
+    private var updateAddress: String? = null
+    private var addressId: Int? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityAddLocationFromMapBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        updateAddress = intent?.getStringExtra("selectedLocation") ?: ""
+        addressId = intent?.getIntExtra("addressId", -1)  // Ensure this is being passed correctly
+        // Toast.makeText(this, "Address ID: $addressId", Toast.LENGTH_SHORT).show()
+
 
         resultLauncher =
             registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result ->
@@ -69,22 +80,58 @@ class AddLocationFromMapActivity : AppCompatActivity(), OnMapReadyCallback {
             getCurrentLocation()
         }
 
-        // Set up Add More Details button to open bottom sheet and pass the address
-        binding.addMoreDetails.setOnClickListener {
-            val enterCompleteAddressBottomSheetFragment = EnterCompleteAddressBottomSheetFragment()
-            val bundle = Bundle()
-            bundle.putString("address", selectedAddress)  // Pass address to the bottom sheet
-            enterCompleteAddressBottomSheetFragment.arguments = bundle
-            enterCompleteAddressBottomSheetFragment.show(
-                supportFragmentManager,
-                "enterCompleteAddressBottomSheetFragment"
-            )
+        //Toast.makeText(this, "${myHelper.numberIs()}", Toast.LENGTH_SHORT).show()
+
+        //  Toast.makeText(this, "$addressId", Toast.LENGTH_SHORT).show()
+
+        if (addressId != null && addressId != -1) {
+            // Handle editing the address using the addressId
+            // Set up Add More Details button to open bottom sheet and pass the address
+            binding.addMoreDetails.setOnClickListener {
+                val enterCompleteAddressBottomSheetFragment =
+                    EnterCompleteAddressBottomSheetFragment()
+                val bundle = Bundle()
+                bundle.putString("address", selectedAddress)
+                bundle.putInt("addressId", addressId!!)
+                enterCompleteAddressBottomSheetFragment.arguments = bundle
+                enterCompleteAddressBottomSheetFragment.show(
+                    supportFragmentManager,
+                    "enterCompleteAddressBottomSheetFragment"
+                )
+            }
+        } else {
+            // Set up Add More Details button to open bottom sheet and pass the address
+            binding.addMoreDetails.setOnClickListener {
+                val enterCompleteAddressBottomSheetFragment =
+                    EnterCompleteAddressBottomSheetFragment()
+                val bundle = Bundle()
+                bundle.putString("address", selectedAddress)  // Pass address to the bottom sheet
+                enterCompleteAddressBottomSheetFragment.arguments = bundle
+                enterCompleteAddressBottomSheetFragment.show(
+                    supportFragmentManager,
+                    "enterCompleteAddressBottomSheetFragment"
+                )
+            }
         }
 
-        binding.search.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(charSequence: CharSequence?, start: Int, count: Int, after: Int) {}
 
-            override fun onTextChanged(charSequence: CharSequence?, start: Int, before: Int, count: Int) {}
+
+        binding.search.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(
+                charSequence: CharSequence?,
+                start: Int,
+                count: Int,
+                after: Int
+            ) {
+            }
+
+            override fun onTextChanged(
+                charSequence: CharSequence?,
+                start: Int,
+                before: Int,
+                count: Int
+            ) {
+            }
 
             override fun afterTextChanged(s: Editable?) {
                 s?.let {
@@ -95,20 +142,22 @@ class AddLocationFromMapActivity : AppCompatActivity(), OnMapReadyCallback {
             }
         })
 
-
         val locationData =
             myHelper.extractAddressDetails(myHelper.getLatitude(), myHelper.getLongitude())
         locationData?.let { updateLocationUI(it.block, it.fullAddress) }
 
-        if (myHelper.checkLocationPermission() && myHelper.isLocationEnable()) {
-            getCurrentLocation()
-        } else {
-            if (!myHelper.isLocationEnable()) {
-                myHelper.onGPS(resultLauncher)
+        if (myHelper.checkLocationPermission()) {
+            if (myHelper.isLocationEnable()) {
+                if (updateAddress.isNullOrEmpty()) {
+                    getCurrentLocation()  // Fallback to current location if no address is passed
+                }
             } else {
-                myHelper.requestLocationPermission(this)
+                myHelper.onGPS(resultLauncher)  // Prompt user to enable GPS
             }
+        } else {
+            myHelper.requestLocationPermission(this)  // Request location permission
         }
+
 
     }
 
@@ -121,10 +170,19 @@ class AddLocationFromMapActivity : AppCompatActivity(), OnMapReadyCallback {
             googleMap.clear()  // Clear any existing markers
             googleMap.addMarker(MarkerOptions().position(latLng))
 
-          //  markerPosition = latLng
+            //  markerPosition = latLng
 
             // Extract address details from the clicked location
             extractAddressDetails(latLng.latitude, latLng.longitude)
+
+            updateAddress?.let {
+                getLocationFromAddress(it)
+                updateAddress = null
+            }
+
+        }
+        updateAddress?.let {
+            getLocationFromAddress(it)
         }
 
     }
@@ -187,7 +245,6 @@ class AddLocationFromMapActivity : AppCompatActivity(), OnMapReadyCallback {
             }
         } catch (e: IOException) {
             e.printStackTrace()
-            Toast.makeText(this, "Unable to find the location.", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -207,12 +264,24 @@ class AddLocationFromMapActivity : AppCompatActivity(), OnMapReadyCallback {
                 }
 
             } else {
-                Toast.makeText(this, "Location permission is required to get current location.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    this,
+                    "Location permission is required to get current location.",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
     }
 
     companion object {
         private const val LOCATION_PERMISSION_REQUEST_CODE = 1
+    }
+
+
+    override fun addressSave() {
+        val intent = Intent(this, MainActivity::class.java)
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
+        startActivity(intent)
+        finishAffinity()
     }
 }

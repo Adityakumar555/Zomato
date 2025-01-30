@@ -9,6 +9,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -17,9 +18,11 @@ import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.test.zomato.R
 import com.test.zomato.databinding.FragmentHomeBinding
+import com.test.zomato.utils.AppSharedPreferences
 import com.test.zomato.utils.EnableDeviceLocationBottomSheetFragment
 import com.test.zomato.utils.MyHelper
 import com.test.zomato.view.location.SelectAddressActivity
+import com.test.zomato.view.location.models.UserSavedAddress
 import com.test.zomato.view.login.repository.UserViewModel
 import com.test.zomato.view.main.home.adapter.AllRestaurantsAdapter
 import com.test.zomato.view.main.home.adapter.ExploreItemAdapter
@@ -39,12 +42,15 @@ class HomeFragment : Fragment(), RestaurantsClickListener {
     private lateinit var itemList: List<WhatsOnYourMindItemData>
     private lateinit var whatsOnYourMindItemAdapter: WhatsOnYourMindItemAdapter
     private val myHelper by lazy { MyHelper(requireActivity()) }
-    private lateinit var userViewModel:UserViewModel
+    private lateinit var userViewModel: UserViewModel
+
     //  private val geocoder by lazy { Geocoder(requireContext(), Locale.getDefault()) }
     private lateinit var mainViewModel: MainViewModel
 
     private lateinit var allRestaurantsAdapter: AllRestaurantsAdapter
     private lateinit var fusedLocationClient: FusedLocationProviderClient
+
+    private lateinit var savedAddresses: List<UserSavedAddress>
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -61,6 +67,42 @@ class HomeFragment : Fragment(), RestaurantsClickListener {
         setLocationOnToolbar()
         fetchUserData(myHelper.numberIs())
 
+        val appPreferences = activity?.let { AppSharedPreferences(it) }
+        val isSkipBtnClick = appPreferences?.getBoolean("skipBtnClick")
+
+        if (isSkipBtnClick == true) {
+            binding.joinPrimeLayout.visibility = View.GONE
+            binding.profile.visibility = View.GONE
+            binding.vegAndNonVegMode.visibility = View.GONE
+            binding.menuIcon.visibility = View.VISIBLE
+
+            binding.menuIcon.setOnClickListener {
+                val intent = Intent(context, ProfileActivity::class.java)
+                activity?.startActivity(intent)
+            }
+
+        } else {
+            binding.joinPrimeLayout.visibility = View.VISIBLE
+            binding.profile.visibility = View.VISIBLE
+            binding.vegAndNonVegMode.visibility = View.VISIBLE
+            binding.menuIcon.visibility = View.GONE
+
+            mainViewModel.getAllAddresses("")
+            activity?.let {
+                mainViewModel.addresses.observe(it) { addresses ->
+                    if (addresses.isNotEmpty()) {
+                        val localSavedAddress =
+                            addresses.map { it.copy(currentUserNumber = myHelper.numberIs()) }
+                        mainViewModel.saveAddressesForUser(localSavedAddress)
+                    }
+
+                }
+            }
+
+
+        }
+
+        //Toast.makeText(requireActivity(), "${myHelper.numberIs()}", Toast.LENGTH_SHORT).show()
 
         binding.userLocation.setOnClickListener {
             val intent = Intent(context, SelectAddressActivity::class.java)
@@ -214,7 +256,6 @@ class HomeFragment : Fragment(), RestaurantsClickListener {
         binding.recyclerView2.layoutManager =
             LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
         binding.recyclerView2.adapter = whatsOnYourMindItemAdapter
-
 
 
         val restaurants = listOf(
@@ -441,7 +482,7 @@ class HomeFragment : Fragment(), RestaurantsClickListener {
         )
 
 
-         allRestaurantsAdapter = AllRestaurantsAdapter(restaurants, this)
+        allRestaurantsAdapter = AllRestaurantsAdapter(restaurants, this)
         binding.recyclerView3.layoutManager = LinearLayoutManager(context)
         binding.recyclerView3.adapter = allRestaurantsAdapter
 
@@ -457,9 +498,17 @@ class HomeFragment : Fragment(), RestaurantsClickListener {
 
                 val searchText = p0.toString().trim()
 
-                val list = if(searchText.isNotEmpty()){
-                    restaurants.filter { it.restaurantName.contains(searchText,ignoreCase = true) || it.recommendedFoodList[0].foodName.contains(searchText,ignoreCase = true) }
-                }else{
+                val list = if (searchText.isNotEmpty()) {
+                    restaurants.filter {
+                        it.restaurantName.contains(
+                            searchText,
+                            ignoreCase = true
+                        ) || it.recommendedFoodList[0].foodName.contains(
+                            searchText,
+                            ignoreCase = true
+                        )
+                    }
+                } else {
                     restaurants
                 }
 
@@ -468,6 +517,12 @@ class HomeFragment : Fragment(), RestaurantsClickListener {
             }
         })
 
+
+        /* // Observe the LiveData for saved addresses
+         mainViewModel.addresses.observe(viewLifecycleOwner) { addresses ->
+             savedAddresses = addresses
+             updateToolbarLocation()
+         }*/
 
 
         return binding.root
@@ -500,12 +555,34 @@ class HomeFragment : Fragment(), RestaurantsClickListener {
                     }
                 }
             }
+
+            mainViewModel.getAllAddresses(userPhoneNumber)
+
         }
+
     }
+
+    /* private fun updateToolbarLocation() {
+         val selectedAddress = getSelectedAddress()
+         if (selectedAddress != null) {
+             // Display the selected address in the toolbar
+             binding.userBlockLocation.text = selectedAddress.selectedLocation
+             binding.address.text = "${selectedAddress.houseAddress}, ${selectedAddress.nearbyLandmark}"
+         } else {
+             // If no selected address, display current location
+             setLocationOnToolbar()
+         }
+     }*/
+
+    /* private fun getSelectedAddress(): UserSavedAddress? {
+         // Check if any address has `addressSelected` as true
+         return savedAddresses.find { it.addressSelected }
+     }*/
+
 
     private fun setLocationOnToolbar() {
 
-        if (myHelper.checkLocationPermission() && myHelper.isLocationEnable()){
+        if (myHelper.checkLocationPermission() && myHelper.isLocationEnable()) {
             activity?.let {
                 fusedLocationClient.lastLocation.addOnCompleteListener(it) { task ->
                     val location: Location? = task.result
@@ -514,12 +591,12 @@ class HomeFragment : Fragment(), RestaurantsClickListener {
                             myHelper.extractAddressDetails(location.latitude, location.longitude)
                         binding.userBlockLocation.text = locationData?.block
                         binding.address.text = "${locationData?.locality},${locationData?.state}"
-                    }else{
+                    } else {
                         setLocationOnToolbarFromSharedprefrence()
                     }
                 }
             }
-        }else{
+        } else {
             setLocationOnToolbarFromSharedprefrence()
         }
 

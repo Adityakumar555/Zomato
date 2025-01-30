@@ -4,24 +4,18 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.test.zomato.repository.GeoApifyRepository
-import com.test.zomato.repository.roomDb.CartDatabase
-import com.test.zomato.repository.roomDb.RoomDbRepository
+import com.test.zomato.utils.RoomDatabaseHelper
 import com.test.zomato.view.location.models.PlaceFeature
 import com.test.zomato.view.location.models.UserSavedAddress
-import com.test.zomato.view.location.repository.UserSavedAddressDao
 import com.test.zomato.view.location.repository.UserSavedAddressRepository
-import com.test.zomato.view.login.repository.UserRepository
-import com.test.zomato.view.main.home.models.FoodItem
-import com.test.zomato.view.main.home.models.RestaurantDetails
 import kotlinx.coroutines.launch
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     private val userSavedAddressRepository by lazy {
-        UserSavedAddressRepository(CartDatabase.getInstance(application)!!.userSavedAddressDao())
+        UserSavedAddressRepository(RoomDatabaseHelper.getInstance(application)!!.userSavedAddressDao())
     }
 
     private val setCount = MutableLiveData<Int>(1)
@@ -52,11 +46,23 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    // LiveData to hold list of saved addresses
+    private val _addresses = MutableLiveData<List<UserSavedAddress>>()
+    val addresses: LiveData<List<UserSavedAddress>> = _addresses
+
+    // Function to fetch all saved addresses
+    fun getAllAddresses(numberIs: String) {
+        viewModelScope.launch {
+            val addressesList = userSavedAddressRepository.getAllAddresses(numberIs)
+            _addresses.postValue(addressesList)
+        }
+    }
 
     // Function to save user address
     fun saveAddress(
         receiverName: String,
         receiverNumber: String,
+        currentUserNumber: String,
         saveAddressAs: String,
         selectedLocation: String,
         houseAddress: String,
@@ -66,21 +72,62 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             val address = UserSavedAddress(
                 receiverName = receiverName,
                 receiverNumber = receiverNumber,
+                currentUserNumber = currentUserNumber,
                 saveAddressAs = saveAddressAs,
                 selectedLocation = selectedLocation,
                 houseAddress = houseAddress,
-                nearbyLandmark = nearbyLandmark
+                nearbyLandmark = nearbyLandmark,
+                addressSelected = true
             )
             userSavedAddressRepository.saveAddress(address)
         }
     }
 
-    fun getAllAddresses() {
+    fun saveAddressesForUser(addresses: List<UserSavedAddress>) {
         viewModelScope.launch {
-            val addresses = userSavedAddressRepository.getAllAddresses()
-            // Handle the list of addresses as needed (e.g., updating UI)
+            userSavedAddressRepository.deleteAddressesWithUserNumber("")
+            userSavedAddressRepository.saveMultipleAddresses(addresses)
         }
     }
+
+
+
+
+    fun updateAddress(
+        addressId: Int,
+        receiverName: String,
+        receiverNumber: String,
+        currentUserNumber: String,
+        saveAddressAs: String,
+        selectedLocation: String,
+        houseAddress: String,
+        nearbyLandmark: String
+    ) {
+        viewModelScope.launch {
+            val address = UserSavedAddress(
+                id = addressId, // Make sure to pass the id for update
+                receiverName = receiverName,
+                receiverNumber = receiverNumber,
+                currentUserNumber = currentUserNumber,
+                saveAddressAs = saveAddressAs,
+                selectedLocation = selectedLocation,
+                houseAddress = houseAddress,
+                nearbyLandmark = nearbyLandmark,
+                addressSelected = false // Resetting the selection flag for update
+            )
+            userSavedAddressRepository.updateAddress(address)
+        }
+    }
+
+
+
+    fun deleteAddress(address: UserSavedAddress) {
+        viewModelScope.launch {
+            userSavedAddressRepository.deleteAddress(address)
+        }
+    }
+
+
 
 
 }

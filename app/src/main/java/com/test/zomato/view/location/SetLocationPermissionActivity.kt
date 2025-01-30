@@ -8,10 +8,11 @@ import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import com.test.zomato.databinding.ActivitySetLocationBinding
-import com.test.zomato.view.main.MainActivity
+import com.test.zomato.utils.AppSharedPreferences
 import com.test.zomato.utils.EnableAppLocationPermissionDialogFragment
 import com.test.zomato.utils.MyHelper
 import com.test.zomato.utils.RequestPermissionDialog
+import com.test.zomato.view.main.MainActivity
 
 class SetLocationPermissionActivity : AppCompatActivity() {
 
@@ -19,14 +20,12 @@ class SetLocationPermissionActivity : AppCompatActivity() {
     private val myHelper: MyHelper by lazy { MyHelper(this) }
     private lateinit var resultLauncher: ActivityResultLauncher<IntentSenderRequest>
 
+    //  var skip :Boolean = false
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivitySetLocationBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        getSharedPreferences("AppPreferences", MODE_PRIVATE).edit()
-            .putBoolean("VisitedSetLocation", true)
-            .apply()
 
         // Set up result launcher for GPS settings
         resultLauncher =
@@ -54,6 +53,15 @@ class SetLocationPermissionActivity : AppCompatActivity() {
                 }
             } else {
                 myHelper.requestLocationPermission(this)
+            }
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (myHelper.checkLocationPermission()) {
+            if (myHelper.isLocationEnable()) {
+                navigateToMainActivity()
             }
         }
     }

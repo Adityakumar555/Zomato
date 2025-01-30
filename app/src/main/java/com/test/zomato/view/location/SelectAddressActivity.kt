@@ -2,6 +2,7 @@ package com.test.zomato.view.location
 
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -16,12 +17,17 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.test.zomato.R
 import com.test.zomato.databinding.ActivitySelectAddressBinding
+import com.test.zomato.utils.AppSharedPreferences
 import com.test.zomato.utils.EnableAppLocationPermissionDialogFragment
 import com.test.zomato.utils.MyHelper
+import com.test.zomato.view.location.adapter.ShowAllSavedAddressAdapter
 import com.test.zomato.view.location.adapter.ViewNearbyLocationsAdapter
+import com.test.zomato.view.location.interfaces.AddressMenuClickListener
+import com.test.zomato.view.location.models.UserSavedAddress
+import com.test.zomato.view.login.repository.UserViewModel
 import com.test.zomato.viewModels.MainViewModel
 
-class SelectAddressActivity : AppCompatActivity() {
+class SelectAddressActivity : AppCompatActivity(), AddressMenuClickListener {
 
     private lateinit var binding: ActivitySelectAddressBinding
 
@@ -31,14 +37,16 @@ class SelectAddressActivity : AppCompatActivity() {
 
     private lateinit var viewNearbyLocationsAdapter: ViewNearbyLocationsAdapter
     private lateinit var resultLauncher: ActivityResultLauncher<IntentSenderRequest>
-
+    private lateinit var addressAdapter: ShowAllSavedAddressAdapter
+    private lateinit var userViewModel: UserViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+        // enableEdgeToEdge()
         binding = ActivitySelectAddressBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        window.statusBarColor = Color.parseColor("#F3F4FA")
 
         resultLauncher =
             registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result ->
@@ -56,12 +64,35 @@ class SelectAddressActivity : AppCompatActivity() {
         mainViewModel = ViewModelProvider(this)[MainViewModel::class.java]
 
 
+        val appPreferences = AppSharedPreferences(this)
+        val isSkipBtnClick = appPreferences.getBoolean("skipBtnClick")
+
+        if (isSkipBtnClick) {
+            binding.blinketCard.visibility = View.GONE
+            binding.savedAddressRecyclerViewLayout.visibility = View.GONE
+            binding.dividerView4.visibility = View.GONE
+        }else{
+            binding.dividerView4.visibility = View.VISIBLE
+            binding.savedAddressRecyclerViewLayout.visibility = View.VISIBLE
+            binding.blinketCard.visibility = View.VISIBLE
+        }
+
+        updateTheNearbyLocationAdapter()
+
         binding.backButton.setOnClickListener {
             finish()
         }
 
+        userViewModel = ViewModelProvider(this).get(UserViewModel::class.java)
+
+       // Toast.makeText(this, "${myHelper.numberIs()}", Toast.LENGTH_SHORT).show()
+
+
+        showSavedAddressInRecyclerView()
+
+
         binding.addAddress.setOnClickListener {
-            val intent = Intent(this,AddLocationFromMapActivity::class.java)
+            val intent = Intent(this, AddLocationFromMapActivity::class.java)
             startActivity(intent)
         }
 
@@ -99,29 +130,53 @@ class SelectAddressActivity : AppCompatActivity() {
             }
         }
 
-        Toast.makeText(
+      /*  Toast.makeText(
             this,
             "${myHelper.getLatitude()},${myHelper.getLongitude()}",
             Toast.LENGTH_SHORT
-        ).show()
+        ).show()*/
 
-        setAdapter()
-        updateTheNearbyLocationAdapter()
 
     }
 
+    private fun showSavedAddressInRecyclerView() {
+        addressAdapter = ShowAllSavedAddressAdapter(this)
+        binding.savedAddressRecyclerView.layoutManager = LinearLayoutManager(this)
+        binding.savedAddressRecyclerView.adapter = addressAdapter
 
-    private fun setAdapter() {
-        viewNearbyLocationsAdapter = ViewNearbyLocationsAdapter()
-        binding.recyclerView.layoutManager = LinearLayoutManager(this)
-        binding.recyclerView.adapter = viewNearbyLocationsAdapter
+        binding.savedAddressProgressBar.visibility = View.VISIBLE
+        binding.savedAddressRecyclerView.visibility = View.GONE
+
+        mainViewModel.getAllAddresses(myHelper.numberIs())
+        mainViewModel.addresses.observe(this) { addresses ->
+
+            if (addresses.isEmpty()) {
+                binding.savedAddressRecyclerViewLayout.visibility = View.GONE
+                binding.dividerView4.visibility = View.GONE
+            } else {
+                binding.savedAddressRecyclerViewLayout.visibility = View.VISIBLE
+                binding.savedAddressRecyclerView.visibility = View.VISIBLE
+                binding.dividerView4.visibility = View.VISIBLE
+                binding.savedAddressProgressBar.visibility = View.GONE
+                addressAdapter.updateAddresses(addresses)
+                addressAdapter.notifyDataSetChanged()
+            }
+
+        }
     }
+
+
+
 
 
     private fun updateTheNearbyLocationAdapter() {
+        viewNearbyLocationsAdapter = ViewNearbyLocationsAdapter()
+        binding.recyclerView.layoutManager = LinearLayoutManager(this)
+        binding.recyclerView.adapter = viewNearbyLocationsAdapter
+
         binding.progressBar.visibility = View.VISIBLE
         binding.recyclerView.visibility = View.GONE
-        mainViewModel.getNearByLocation(myHelper.getLatitude(),myHelper.getLongitude())
+        mainViewModel.getNearByLocation(myHelper.getLatitude(), myHelper.getLongitude())
 
         mainViewModel.nearLocationList.observe(this, Observer { validPlaces ->
             binding.progressBar.visibility = View.GONE
@@ -214,5 +269,24 @@ class SelectAddressActivity : AppCompatActivity() {
     override fun onBackPressed() {
         super.onBackPressed()
         overridePendingTransition(R.anim.slide_in_top, R.anim.slide_out_bottom)
+    }
+
+
+    override fun menuClick(address: UserSavedAddress, action: String) {
+        when (action) {
+            "edit" -> {
+                // Handle Edit action
+                val intent = Intent(this, AddLocationFromMapActivity::class.java)
+                intent.putExtra("selectedLocation", address.selectedLocation)
+                intent.putExtra("addressId", address.id)
+                startActivity(intent)
+            }
+
+            "delete" -> {
+                // Handle Delete action
+                mainViewModel.deleteAddress(address)
+                mainViewModel.getAllAddresses(myHelper.numberIs())
+            }
+        }
     }
 }

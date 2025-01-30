@@ -4,9 +4,11 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.view.View
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import com.test.zomato.R
+import com.test.zomato.utils.AppSharedPreferences
 import com.test.zomato.view.location.SetLocationPermissionActivity
 import com.test.zomato.view.login.UserSignUpActivity
 import com.test.zomato.view.main.MainActivity
@@ -24,27 +26,36 @@ class SplashScreen : AppCompatActivity() {
         myHelper = MyHelper(this)
         myHelper.setStatusBarIconColor(this,true)
 
-        // Check if user has visited MainActivity or SetLocationActivity
-        val sharedPreferences = getSharedPreferences("AppPreferences", MODE_PRIVATE)
-        val hasVisitedMainActivity = sharedPreferences.getBoolean("VisitedMainActivity", false)
-        val hasVisitedSetLocation = sharedPreferences.getBoolean("VisitedSetLocation", false)
 
-        Handler(Looper.getMainLooper()).postDelayed({
-            when {
-                hasVisitedMainActivity -> {
-                    // Navigate directly to MainActivity
-                    startActivity(Intent(this, MainActivity::class.java))
+        val appPreferences = AppSharedPreferences(this)
+        val isSkipBtnClick = appPreferences.getBoolean("skipBtnClick")
+        val hasVisitedMainActivity = appPreferences.getBoolean("VisitedMainActivity", false)
+        val hasVisitedSetLocation = appPreferences.getBoolean("VisitedSetLocation", false)
+
+        if (isSkipBtnClick) {
+            Handler(Looper.getMainLooper()).postDelayed({
+            startActivity(Intent(this, UserSignUpActivity::class.java))
+            }, 1000)
+        }else{
+            Handler(Looper.getMainLooper()).postDelayed({
+                when {
+                    hasVisitedMainActivity -> {
+                        // Navigate directly to MainActivity
+                        startActivity(Intent(this, MainActivity::class.java))
+                    }
+                    hasVisitedSetLocation -> {
+                        // Navigate directly to SetLocationActivity
+                        startActivity(Intent(this, SetLocationPermissionActivity::class.java))
+                    }
+                    else -> {
+                        // Navigate to UserSignUpActivity
+                        startActivity(Intent(this, UserSignUpActivity::class.java))
+                    }
                 }
-                hasVisitedSetLocation -> {
-                    // Navigate directly to SetLocationActivity
-                    startActivity(Intent(this, SetLocationPermissionActivity::class.java))
-                }
-                else -> {
-                    // Navigate to UserSignUpActivity
-                    startActivity(Intent(this, UserSignUpActivity::class.java))
-                }
-            }
-            finish()
-        }, 1000) // Adjust delay as needed
+                finish()
+            }, 1000) // Adjust delay as needed
+        }
+
+
     }
 }

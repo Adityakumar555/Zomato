@@ -40,7 +40,9 @@ class MyHelper(private val context: Context) {
 
     private lateinit var resultLauncher: ActivityResultLauncher<IntentSenderRequest>
 
-    val sharedPreferences = context.getSharedPreferences("AppPreferences", MODE_PRIVATE)
+    val appPreferences = AppSharedPreferences(context)
+
+  //  val sharedPreferences = context.getSharedPreferences("AppPreferences", MODE_PRIVATE)
 
     // true → White icons.
     // false → Black icons.
@@ -63,12 +65,12 @@ class MyHelper(private val context: Context) {
 
 
      fun getLatitude(): Double {
-        val latitude = sharedPreferences.getFloat("Latitude", 0f).toDouble()
+        val latitude = appPreferences.getFloat("Latitude", 0f).toDouble()
         return latitude
     }
 
      fun getLongitude(): Double {
-        val longitude = sharedPreferences.getFloat("Longitude", 0f).toDouble()
+        val longitude = appPreferences.getFloat("Longitude", 0f).toDouble()
         return longitude
     }
 
@@ -243,7 +245,7 @@ class MyHelper(private val context: Context) {
     }
 
     fun numberIs():String{
-        val userPhoneNumber = sharedPreferences.getString("userNumber", "") ?: ""
+        val userPhoneNumber = appPreferences.getString("userNumber", "") ?: ""
         return userPhoneNumber
     }
 

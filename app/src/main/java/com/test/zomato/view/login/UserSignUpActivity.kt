@@ -18,6 +18,7 @@ import com.google.android.gms.auth.api.credentials.CredentialsApi
 import com.google.android.gms.auth.api.credentials.CredentialsOptions
 import com.google.android.gms.auth.api.credentials.HintRequest
 import com.test.zomato.databinding.ActivityUserSignUpBinding
+import com.test.zomato.utils.AppSharedPreferences
 import com.test.zomato.utils.CustomProgressDialog
 import com.test.zomato.utils.MyHelper
 import com.test.zomato.utils.RequestPermissionDialog
@@ -66,6 +67,10 @@ class UserSignUpActivity : AppCompatActivity() {
         }
 
         binding.skip.setOnClickListener {
+
+            val appPreferences = AppSharedPreferences(this)
+            appPreferences.saveBoolean("skipBtnClick",true)
+
             val intent = Intent(this, SetLocationPermissionActivity::class.java)
             startActivity(intent)
             finish()
@@ -83,6 +88,9 @@ class UserSignUpActivity : AppCompatActivity() {
                     Toast.LENGTH_SHORT
                 ).show()
             } else {
+                val appPreferences = AppSharedPreferences(this)
+                appPreferences.saveBoolean("skipBtnClick",false)
+
                 showProgressBar()
                 Handler(Looper.getMainLooper()).postDelayed({
                     val countryCodeWithPlus = binding.countryPicker.selectedCountryCodeWithPlus
@@ -192,7 +200,6 @@ class UserSignUpActivity : AppCompatActivity() {
 
     override fun onBackPressed() {
         super.onBackPressed()
-        finishAffinity();
         finish()
     }
 }
