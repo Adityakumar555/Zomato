@@ -8,7 +8,7 @@ import android.view.ViewGroup
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.test.zomato.databinding.FragmentSelectAddressToDeliverFoodBottomSheetBinding
 import com.test.zomato.utils.MyHelper
-import com.test.zomato.view.main.placeOrders.ShowCartFoodDetailsActivity
+import com.test.zomato.view.cart.ShowCartFoodDetailsActivity
 import com.test.zomato.view.main.home.interfaces.SelectAddressClickListener
 
 class SelectAddressToDeliverFoodBottomSheetFragment : BottomSheetDialogFragment() {

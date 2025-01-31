@@ -5,34 +5,40 @@ import android.app.Activity
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Geocoder
 import android.location.LocationManager
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Build
+import android.provider.Settings
 import android.util.Log
 import android.util.Patterns
 import android.view.View
 import android.view.WindowInsetsController
 import android.view.inputmethod.InputMethodManager
+import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.IntentSenderRequest
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity.INPUT_METHOD_SERVICE
 import androidx.appcompat.app.AppCompatActivity.LOCATION_SERVICE
-import androidx.appcompat.app.AppCompatActivity.MODE_PRIVATE
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.core.location.LocationManagerCompat
+import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationRequest.Builder.IMPLICIT_MIN_UPDATE_INTERVAL
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.LocationSettingsRequest
 import com.google.android.gms.location.Priority
+import com.google.android.gms.tasks.OnCompleteListener
 import com.google.i18n.phonenumbers.PhoneNumberUtil
 import com.test.zomato.R
-import com.test.zomato.view.main.home.models.LocationData
+import com.test.zomato.view.location.models.LocationData
 import java.io.IOException
 import java.util.Locale
 
@@ -87,23 +93,30 @@ class MyHelper(private val context: Context) {
                 val addressParts = fullAddress.split(",").map { it.trim() }
 
                 // Extract street and block
-                val street = addressParts.getOrNull(0) ?: "Unknown Street" // e.g., "123"
+                val street = addressParts.getOrNull(0) ?: "Unknown Street"
+
                 val block = if (addressParts.size > 1) {
                     val possibleBlock = addressParts[1]
                     if (possibleBlock.contains("Block", ignoreCase = true)) {
                         possibleBlock
                     } else {
-                        "Unknown Block"
+                        addressParts[0]
                     }
                 } else {
                     "Unknown Block"
                 }
 
-                val locality = address.subLocality ?: "Unknown Locality"  // City
-                val state = address.locality ?: "Unknown State"       // State
-                val subState = address.adminArea ?: "Unknown State"       // State
-                val postalCode = address.postalCode ?: "Unknown Postal Code" // Postal code
-                val country = address.countryName ?: "Unknown Country" // Country
+                val locality = address.subLocality ?: addressParts[2]
+                val state = address.locality ?: addressParts[3]
+                val subState = address.adminArea ?: "Unknown State"
+                val postalCode = address.postalCode ?: "Unknown Postal Code"
+                val country = address.countryName ?: "Unknown Country"
+
+                Log.d("addressinMyhelper", "${addressParts[2]},${addressParts[1]}")
+
+                Log.d("addressinMyhelper", "${fullAddress}")
+
+                Log.d("addressinMyhelper", "${block},${street},${locality},${state},${subState},${postalCode},${country}")
 
                 // Create a LocationData instance
                 return LocationData(
@@ -134,39 +147,6 @@ class MyHelper(private val context: Context) {
         return networkCapabilities != null && networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
     }
 
-    fun getCityName(lat: Double, long: Double): String? {
-        val cityName: String?
-        val geoCoder = Geocoder(context, Locale.getDefault())
-        val address = geoCoder.getFromLocation(lat, long, 1)
-        cityName = address?.get(0)?.locality ?: address?.get(0)?.subLocality
-        Log.d("TAGi", address?.get(0)?.adminArea.toString())
-        Log.d("TAGi", address?.get(0)?.subLocality.toString())
-        Log.d("TAGi", address?.get(0)?.locality.toString())
-        Log.d("TAGi", cityName.toString())
-        return cityName
-    }
-
-    fun showNotification(message: String?) {
-        val notificationManager =
-            context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                CHANNEL_ID, CHANNEL_NAME, NotificationManager.IMPORTANCE_DEFAULT
-            )
-            notificationManager.createNotificationChannel(channel)
-        }
-
-        val notification = NotificationCompat.Builder(context, CHANNEL_ID)
-            //.setContentText(message)
-            .setContentTitle("Zomato OTP Notification").setSmallIcon(R.drawable.zomato_app_icon)
-            .setPriority(NotificationCompat.PRIORITY_HIGH)
-
-            .setStyle(NotificationCompat.BigTextStyle().bigText(message)).build()
-
-        notificationManager.notify(NOTIFICATION_ID, notification)
-
-    }
 
     fun requestLocationPermission(activity: Activity) {
         ActivityCompat.requestPermissions(
@@ -190,9 +170,17 @@ class MyHelper(private val context: Context) {
         return LocationManagerCompat.isLocationEnabled(location)
     }
 
-    fun onGPS(resultLauncher: ActivityResultLauncher<IntentSenderRequest>) {
+    fun onGPS(resultLauncher: ActivityResultLauncher<IntentSenderRequest>)  {
+
         // Creates a request for GPS location.
-        val locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 3000).build()
+        val locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 3000)
+           /* .setWaitForAccurateLocation(false)
+           // .setMinUpdateIntervalMillis(IMPLICIT_MIN_UPDATE_INTERVAL)
+          //  .setMaxUpdateDelayMillis(100000)
+            .setMinUpdateDistanceMeters(10f) // Request updates when location changes by 10 meters
+           // .setMaxWaitTime(5000) // Wait for maximum 5 seconds to get location*/
+            .build()
+
         // This builder adds location requests to check settings.
         val builder = LocationSettingsRequest.Builder().addLocationRequest(locationRequest)
         // checkLocationSettings method check device gps is on or of
@@ -203,11 +191,14 @@ class MyHelper(private val context: Context) {
         task.addOnFailureListener { exception ->
             if (exception is ResolvableApiException) {
                 try {
-                    val intentSenderRequest =
-                        IntentSenderRequest.Builder(exception.resolution).build()
+                   // ek resolution prompt create hota hai
+                    val intentSenderRequest = IntentSenderRequest.Builder(exception.resolution).build()
+                    // resolution prompt ko launch karne ke liye IntentSenderRequest ko resultLauncher.launch(intentSenderRequest) se isko execute karte hain.
                     resultLauncher.launch(intentSenderRequest)
+                    // show a popup
                 } catch (e: Exception) {
                     e.printStackTrace()
+                 //   Toast.makeText(context, "GPS is already enabled", Toast.LENGTH_SHORT).show()
                 }
             }
         }
@@ -253,7 +244,6 @@ class MyHelper(private val context: Context) {
 
 
      fun isValidPhoneNumber(phone: String): Boolean {
-        // This pattern is for validating phone numbers, can be adjusted as per your needs
         return Patterns.PHONE.matcher(phone).matches()
     }
 

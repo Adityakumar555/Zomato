@@ -4,14 +4,14 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.test.zomato.repository.roomDb.CartDao
+import com.test.zomato.cartDB.CartDao
 import com.test.zomato.view.location.models.UserSavedAddress
 import com.test.zomato.view.location.repository.UserSavedAddressDao
 import com.test.zomato.view.login.repository.UserDao
 import com.test.zomato.view.login.userData.User
 import com.test.zomato.view.main.home.models.FoodItem
-import com.test.zomato.view.main.home.models.orderModels.FoodItemInOrder
-import com.test.zomato.view.main.home.models.orderModels.OrderDetails
+import com.test.zomato.view.orders.orderModels.FoodItemInOrder
+import com.test.zomato.view.orders.orderModels.OrderDetails
 
 @Database(entities =[User::class,FoodItem::class, OrderDetails::class, FoodItemInOrder::class,UserSavedAddress::class], version = 1, exportSchema = false)
 abstract class RoomDatabaseHelper:RoomDatabase() {

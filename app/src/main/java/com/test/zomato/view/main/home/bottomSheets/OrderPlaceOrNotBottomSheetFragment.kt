@@ -11,14 +11,14 @@ import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.test.zomato.databinding.FragmentOrderPlaceBottomSheetBinding
-import com.test.zomato.repository.roomDb.RoomDbViewModel
-import com.test.zomato.view.main.placeOrders.ShowCartFoodDetailsActivity
-import com.test.zomato.view.main.home.interfaces.OrderPlcaeClickListener
+import com.test.zomato.cartDB.CartAndOrderViewModel
+import com.test.zomato.view.cart.ShowCartFoodDetailsActivity
+import com.test.zomato.view.orders.interfaces.OrderPlcaeClickListener
 
 class OrderPlaceOrNotBottomSheetFragment : BottomSheetDialogFragment() {
 
     private lateinit var binding: FragmentOrderPlaceBottomSheetBinding
-    private lateinit var roomDbViewModel: RoomDbViewModel
+    private lateinit var roomDbViewModel: CartAndOrderViewModel
 
     private var listner: OrderPlcaeClickListener? = null
     private var handler: Handler? = null
@@ -36,7 +36,7 @@ class OrderPlaceOrNotBottomSheetFragment : BottomSheetDialogFragment() {
     ): View? {
         binding = FragmentOrderPlaceBottomSheetBinding.inflate(inflater, container, false)
 
-        roomDbViewModel = ViewModelProvider(this)[RoomDbViewModel::class.java]
+        roomDbViewModel = ViewModelProvider(this)[CartAndOrderViewModel::class.java]
 
         // Retrieve the location and total price from the arguments
         val location = arguments?.getString("location")

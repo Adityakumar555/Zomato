@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/top_left_right_rounded_corners"
-    tools:context=".view.location.EnterCompleteAddressBottomSheetFragment">
+    tools:context=".view.location.bottomSheets.EnterCompleteAddressBottomSheetFragment">
 
     <RelativeLayout
         android:id="@+id/close_button"

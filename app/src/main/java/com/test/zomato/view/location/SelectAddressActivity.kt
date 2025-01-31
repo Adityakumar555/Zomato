@@ -3,6 +3,7 @@ package com.test.zomato.view.location
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
+import android.location.Location
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -15,6 +16,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import com.test.zomato.R
 import com.test.zomato.databinding.ActivitySelectAddressBinding
 import com.test.zomato.utils.AppSharedPreferences
@@ -40,11 +43,16 @@ class SelectAddressActivity : AppCompatActivity(), AddressMenuClickListener {
     private lateinit var addressAdapter: ShowAllSavedAddressAdapter
     private lateinit var userViewModel: UserViewModel
 
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         // enableEdgeToEdge()
         binding = ActivitySelectAddressBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
         window.statusBarColor = Color.parseColor("#F3F4FA")
 
@@ -115,12 +123,26 @@ class SelectAddressActivity : AppCompatActivity(), AddressMenuClickListener {
 
         } else {
 
-            val locationData =
-                myHelper.extractAddressDetails(myHelper.getLatitude(), myHelper.getLongitude())
-            binding.text1.text = "Use current location"
+            if (myHelper.checkLocationPermission() && myHelper.isLocationEnable()) {
+                    fusedLocationClient.lastLocation.addOnCompleteListener(this) { task ->
+                        val location: Location? = task.result
+                        if (location != null) {
+                            val locationData =
+                                myHelper.extractAddressDetails(location.latitude, location.longitude)
 
-            binding.text5.text =
-                "${locationData?.block},${locationData?.locality},${locationData?.state}"
+                            binding.text1.text = "Use current location"
+
+                            binding.text5.text =
+                                "${locationData?.block},${locationData?.locality},${locationData?.state}"
+
+                        } else {
+                            setLocationOnToolbarFromSharedprefrence()
+                        }
+                    }
+
+            } else {
+                setLocationOnToolbarFromSharedprefrence()
+            }
 
             binding.enableLocationBtn.visibility = View.GONE
             binding.selectCurrentLocation.visibility = View.VISIBLE
@@ -130,12 +152,16 @@ class SelectAddressActivity : AppCompatActivity(), AddressMenuClickListener {
             }
         }
 
-      /*  Toast.makeText(
-            this,
-            "${myHelper.getLatitude()},${myHelper.getLongitude()}",
-            Toast.LENGTH_SHORT
-        ).show()*/
 
+    }
+
+    private fun setLocationOnToolbarFromSharedprefrence() {
+        val locationData =
+            myHelper.extractAddressDetails(myHelper.getLatitude(), myHelper.getLongitude())
+        binding.text1.text = "Use current location"
+
+        binding.text5.text =
+            "${locationData?.block},${locationData?.locality},${locationData?.state}"
 
     }
 
@@ -212,54 +238,6 @@ class SelectAddressActivity : AppCompatActivity(), AddressMenuClickListener {
         }
     }
 
-    /*    private fun fetchNearbyShops(latitude: Double, longitude: Double) {
-            val call = RetrofitInstance.apiCall.getNearbyPlaces(
-                categories = "commercial,education,catering",
-                filter = "circle:$longitude,$latitude,5000",
-                bias = "proximity:$longitude,$latitude",
-                limit = 30,
-                apiKey = "8a3768af0f8143a5b82b582da20558c6"
-            )
-
-            call.enqueue(object : retrofit2.Callback<PlacesResponse> {
-                override fun onResponse(
-                    call: Call<PlacesResponse>,
-                    response: retrofit2.Response<PlacesResponse>
-                ) {
-                    if (response.isSuccessful) {
-                        val places = response.body()?.features
-                        if (!places.isNullOrEmpty()) {
-                            val validPlaces = places.filter {
-                                !it.properties.name.isNullOrEmpty() && !it.properties.formatted.isNullOrEmpty()
-                            }
-
-
-
-                            for (place in validPlaces) {
-                                Log.d("SelectAddressActivity", "Name: ${place.properties.name}, Address: ${place.properties.formatted}")
-                            }
-
-                            Toast.makeText(
-                                this@SelectAddressActivity,
-                                if (validPlaces.isNotEmpty()) "Shops logged successfully" else "No valid shops found",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        } else {
-                            Log.d("SelectAddressActivity", "No shops found nearby")
-                            Toast.makeText(this@SelectAddressActivity, "No shops found nearby", Toast.LENGTH_SHORT).show()
-                        }
-                    } else {
-                        Log.e("SelectAddressActivity", "Failed to fetch shops: ${response.errorBody()?.string()}")
-                        Toast.makeText(this@SelectAddressActivity, "Failed to fetch shops", Toast.LENGTH_SHORT).show()
-                    }
-                }
-
-                override fun onFailure(call: Call<PlacesResponse>, t: Throwable) {
-                    Log.e("SelectAddressActivity", "Error: ${t.localizedMessage}")
-                    Toast.makeText(this@SelectAddressActivity, "Error: ${t.localizedMessage}", Toast.LENGTH_SHORT).show()
-                }
-            })
-        }*/
 
     override fun finish() {
         super.finish()
@@ -275,7 +253,7 @@ class SelectAddressActivity : AppCompatActivity(), AddressMenuClickListener {
     override fun menuClick(address: UserSavedAddress, action: String) {
         when (action) {
             "edit" -> {
-                // Handle Edit action
+                // when user click on Edit click
                 val intent = Intent(this, AddLocationFromMapActivity::class.java)
                 intent.putExtra("selectedLocation", address.selectedLocation)
                 intent.putExtra("addressId", address.id)
@@ -283,7 +261,7 @@ class SelectAddressActivity : AppCompatActivity(), AddressMenuClickListener {
             }
 
             "delete" -> {
-                // Handle Delete action
+                // when user click on delete
                 mainViewModel.deleteAddress(address)
                 mainViewModel.getAllAddresses(myHelper.numberIs())
             }

@@ -7,7 +7,7 @@ import com.denzcoskun.imageslider.constants.ScaleTypes
 import com.denzcoskun.imageslider.interfaces.ItemClickListener
 import com.denzcoskun.imageslider.models.SlideModel
 import com.test.zomato.databinding.RestaurantsItemsBinding
-import com.test.zomato.view.main.home.interfaces.RestaurantsClickListener
+import com.test.zomato.view.cart.interfaces.RestaurantsClickListener
 import com.test.zomato.view.main.home.models.RestaurantDetails
 
 class AllRestaurantsAdapter(

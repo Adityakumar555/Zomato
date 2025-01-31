@@ -1,6 +1,7 @@
 package com.test.zomato.view.main.home
 
 import android.content.Intent
+import android.location.Location
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -12,6 +13,8 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import com.test.zomato.R
 import com.test.zomato.databinding.FragmentDiningBinding
 import com.test.zomato.utils.AppSharedPreferences
@@ -20,6 +23,7 @@ import com.test.zomato.view.location.SelectAddressActivity
 import com.test.zomato.view.login.repository.UserViewModel
 import com.test.zomato.view.main.home.adapter.BarAdapter
 import com.test.zomato.view.main.home.models.BarData
+import com.test.zomato.view.profile.ProfileActivity
 import com.test.zomato.viewModels.MainViewModel
 
 class DiningFragment : Fragment() {
@@ -30,12 +34,16 @@ class DiningFragment : Fragment() {
 
     private lateinit var mainViewModel: MainViewModel
     private lateinit var userViewModel: UserViewModel
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentDiningBinding.inflate(inflater, container, false)
+
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
 
 
         myHelper.setStatusBarIconColor(requireActivity(), false)
@@ -224,10 +232,33 @@ class DiningFragment : Fragment() {
     }
 
     private fun setLocationOnToolbar() {
-        //  val locationData = myHelper.extractAddressDetails(mainViewModel.latitude, mainViewModel.longitude)
+
+        if (myHelper.checkLocationPermission() && myHelper.isLocationEnable()) {
+            activity?.let {
+                fusedLocationClient.lastLocation.addOnCompleteListener(it) { task ->
+                    val location: Location? = task.result
+                    if (location != null) {
+                        val locationData =
+                            myHelper.extractAddressDetails(location.latitude, location.longitude)
+
+                        Log.d("userAddress", "${locationData?.fullAddress}")
+
+                        binding.userBlockLocation.text = locationData?.block
+                        binding.address.text = "${locationData?.locality},${locationData?.state}"
+                    } else {
+                        setLocationOnToolbarFromSharedprefrence()
+                    }
+                }
+            }
+        } else {
+            setLocationOnToolbarFromSharedprefrence()
+        }
+
+    }
+
+    private fun setLocationOnToolbarFromSharedprefrence() {
         val locationData =
             myHelper.extractAddressDetails(myHelper.getLatitude(), myHelper.getLongitude())
-        // Update the TextView elements with fetched data
         binding.userBlockLocation.text = locationData?.block
         binding.address.text = "${locationData?.locality},${locationData?.state}"
     }

@@ -17,7 +17,7 @@ import com.test.zomato.view.main.home.DiningFragment
 import com.test.zomato.view.main.home.HomeFragment
 import com.test.zomato.view.main.home.LiveFragment
 import com.test.zomato.view.main.home.bottomSheets.OrderPlacedSuccessfullyDialogFragment
-import com.test.zomato.view.main.home.interfaces.OrderPlcaeClickListener
+import com.test.zomato.view.orders.interfaces.OrderPlcaeClickListener
 import com.test.zomato.viewModels.MainViewModel
 
 

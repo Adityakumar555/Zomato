@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.test.zomato.R
 import com.test.zomato.databinding.ActivityMyAddressesBinding
+import com.test.zomato.utils.AppSharedPreferences
 import com.test.zomato.utils.MyHelper
 import com.test.zomato.view.location.adapter.ShowAllSavedAddressAdapter
 import com.test.zomato.view.location.interfaces.AddressMenuClickListener
@@ -34,6 +35,16 @@ class MyAddressesBookActivity : AppCompatActivity(), AddressMenuClickListener {
 
         binding.backButton.setOnClickListener {
             finish()
+        }
+
+        val appPreferences =  AppSharedPreferences(this)
+        val isSkipBtnClick = appPreferences.getBoolean("skipBtnClick")
+
+        // when user click on skip btn
+        if (isSkipBtnClick) {
+            binding.blinketCard.visibility = View.GONE
+        }else{
+            binding.blinketCard.visibility = View.VISIBLE
         }
 
         binding.addLocationCard.setOnClickListener {

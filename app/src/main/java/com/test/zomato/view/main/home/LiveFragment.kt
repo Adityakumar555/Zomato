@@ -15,6 +15,7 @@ import com.test.zomato.databinding.FragmentLiveBinding
 import com.test.zomato.utils.AppSharedPreferences
 import com.test.zomato.utils.MyHelper
 import com.test.zomato.view.login.repository.UserViewModel
+import com.test.zomato.view.profile.ProfileActivity
 
 class LiveFragment : Fragment() {
 

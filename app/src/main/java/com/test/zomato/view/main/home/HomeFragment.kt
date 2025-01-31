@@ -21,17 +21,20 @@ import com.test.zomato.databinding.FragmentHomeBinding
 import com.test.zomato.utils.AppSharedPreferences
 import com.test.zomato.utils.EnableDeviceLocationBottomSheetFragment
 import com.test.zomato.utils.MyHelper
+import com.test.zomato.view.cart.RestaurantDetailsActivity
 import com.test.zomato.view.location.SelectAddressActivity
 import com.test.zomato.view.location.models.UserSavedAddress
 import com.test.zomato.view.login.repository.UserViewModel
 import com.test.zomato.view.main.home.adapter.AllRestaurantsAdapter
 import com.test.zomato.view.main.home.adapter.ExploreItemAdapter
 import com.test.zomato.view.main.home.adapter.WhatsOnYourMindItemAdapter
-import com.test.zomato.view.main.home.interfaces.RestaurantsClickListener
+import com.test.zomato.view.cart.interfaces.RestaurantsClickListener
+import com.test.zomato.view.main.JoinGoldActivity
 import com.test.zomato.view.main.home.models.ExploreData
 import com.test.zomato.view.main.home.models.FoodItem
 import com.test.zomato.view.main.home.models.RestaurantDetails
 import com.test.zomato.view.main.home.models.WhatsOnYourMindItemData
+import com.test.zomato.view.profile.ProfileActivity
 import com.test.zomato.viewModels.MainViewModel
 
 class HomeFragment : Fragment(), RestaurantsClickListener {
@@ -70,6 +73,7 @@ class HomeFragment : Fragment(), RestaurantsClickListener {
         val appPreferences = activity?.let { AppSharedPreferences(it) }
         val isSkipBtnClick = appPreferences?.getBoolean("skipBtnClick")
 
+        // when user click on skip btn
         if (isSkipBtnClick == true) {
             binding.joinPrimeLayout.visibility = View.GONE
             binding.profile.visibility = View.GONE
@@ -82,6 +86,7 @@ class HomeFragment : Fragment(), RestaurantsClickListener {
             }
 
         } else {
+            // user user sign in
             binding.joinPrimeLayout.visibility = View.VISIBLE
             binding.profile.visibility = View.VISIBLE
             binding.vegAndNonVegMode.visibility = View.VISIBLE
@@ -485,15 +490,11 @@ class HomeFragment : Fragment(), RestaurantsClickListener {
         binding.recyclerView3.adapter = allRestaurantsAdapter
 
         binding.search.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
 
-            }
-
-            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-            }
+            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
 
             override fun afterTextChanged(p0: Editable?) {
-
                 val searchText = p0.toString().trim()
 
                 val list = if (searchText.isNotEmpty()) {
@@ -553,9 +554,6 @@ class HomeFragment : Fragment(), RestaurantsClickListener {
                     }
                 }
             }
-
-          //  mainViewModel.getAllAddresses(userPhoneNumber)
-
         }
 
     }
@@ -579,28 +577,45 @@ class HomeFragment : Fragment(), RestaurantsClickListener {
 
 
     private fun setLocationOnToolbar() {
+        Log.d("currentuserlatlong_out", "aaya hai")
 
         if (myHelper.checkLocationPermission() && myHelper.isLocationEnable()) {
-            activity?.let {
-                fusedLocationClient.lastLocation.addOnCompleteListener(it) { task ->
-                    val location: Location? = task.result
-                    if (location != null) {
-                        val locationData =
-                            myHelper.extractAddressDetails(location.latitude, location.longitude)
-                        binding.userBlockLocation.text = locationData?.block
-                        binding.address.text = "${locationData?.locality},${locationData?.state}"
-                    } else {
-                        setLocationOnToolbarFromSharedprefrence()
+            try {
+                activity?.let {
+                    fusedLocationClient.lastLocation.addOnCompleteListener(it) { task ->
+                        val location: Location? = task.result
+                        if (location != null) {
+
+                            Log.d("currentuserlatlong", "${location.latitude},${location.latitude}")
+
+                            val locationData =
+                                myHelper.extractAddressDetails(location.latitude, location.longitude)
+
+                            Log.d("userAddress", "${locationData?.fullAddress}")
+
+                           // if (location)
+                            binding.userBlockLocation.text = locationData?.block
+                            binding.address.text = "${locationData?.locality},${locationData?.state}"
+                        } else {
+                            setLocationOnToolbarFromSharedprefrence()
+                        }
                     }
                 }
+            }catch (e:Exception){
+                Toast.makeText(context, "GPS is not working properly", Toast.LENGTH_SHORT).show()
             }
+
         } else {
             setLocationOnToolbarFromSharedprefrence()
+            Log.d("currentuserlatlong_out", "location nahi chala")
+
         }
 
     }
 
     private fun setLocationOnToolbarFromSharedprefrence() {
+        Log.d("currentuserlatlong_out", "location set hone aaya hai")
+
         val locationData =
             myHelper.extractAddressDetails(myHelper.getLatitude(), myHelper.getLongitude())
         binding.userBlockLocation.text = locationData?.block
@@ -611,7 +626,6 @@ class HomeFragment : Fragment(), RestaurantsClickListener {
         val intent = Intent(context, RestaurantDetailsActivity::class.java)
         intent.putExtra("restaurantDetails", restaurantDetails)
         activity?.startActivity(intent)
-
     }
 
     override fun onResume() {

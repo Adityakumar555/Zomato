@@ -5,7 +5,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.test.zomato.repository.GeoApifyRepository
+import com.test.zomato.showNearByLocations.GeoApifyRepository
 import com.test.zomato.utils.RoomDatabaseHelper
 import com.test.zomato.view.location.models.PlaceFeature
 import com.test.zomato.view.location.models.UserSavedAddress

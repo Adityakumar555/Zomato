@@ -12,8 +12,8 @@ import com.bumptech.glide.Glide
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.test.zomato.R
 import com.test.zomato.databinding.FragmentAddFoodInCartBottomSheetBinding
-import com.test.zomato.repository.roomDb.RoomDbViewModel
-import com.test.zomato.view.main.home.interfaces.OnBottomSheetActionListener
+import com.test.zomato.cartDB.CartAndOrderViewModel
+import com.test.zomato.view.cart.interfaces.OnBottomSheetActionListener
 import com.test.zomato.view.main.home.models.FoodItem
 import com.test.zomato.viewModels.MainViewModel
 
@@ -21,7 +21,7 @@ class AddFoodInCartBottomSheet : BottomSheetDialogFragment() {
 
     private lateinit var binding: FragmentAddFoodInCartBottomSheetBinding
     private lateinit var mainViewModel: MainViewModel
-    private lateinit var roomDbViewModel: RoomDbViewModel
+    private lateinit var roomDbViewModel: CartAndOrderViewModel
     private var foodItem: FoodItem? = null
 
     private var listener: OnBottomSheetActionListener? = null
@@ -35,7 +35,7 @@ class AddFoodInCartBottomSheet : BottomSheetDialogFragment() {
 
         // Initialize ViewModel
         mainViewModel = ViewModelProvider(this)[MainViewModel::class.java]
-        roomDbViewModel = ViewModelProvider(this)[RoomDbViewModel::class.java]
+        roomDbViewModel = ViewModelProvider(this)[CartAndOrderViewModel::class.java]
 
         foodItem = arguments?.getParcelable("foodItem")
 

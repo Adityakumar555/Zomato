@@ -3,12 +3,14 @@ package com.test.zomato.view.location
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import com.test.zomato.databinding.ActivitySetLocationBinding
 import com.test.zomato.utils.AppSharedPreferences
+import com.test.zomato.utils.CustomProgressDialog
 import com.test.zomato.utils.EnableAppLocationPermissionDialogFragment
 import com.test.zomato.utils.MyHelper
 import com.test.zomato.utils.RequestPermissionDialog
@@ -31,9 +33,11 @@ class SetLocationPermissionActivity : AppCompatActivity() {
         resultLauncher =
             registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result ->
                 if (result.resultCode == RESULT_OK) {
+
                     navigateToMainActivity()
                 } else {
-                    navigateToMainActivity()
+                    Toast.makeText(this, "Turn On the GPS for get your current location.", Toast.LENGTH_SHORT).show()
+                   // navigateToMainActivity()
                 }
             }
 
@@ -55,6 +59,17 @@ class SetLocationPermissionActivity : AppCompatActivity() {
                 myHelper.requestLocationPermission(this)
             }
         }
+    }
+
+    private fun showProgressBar() {
+        val progressDialog = CustomProgressDialog()
+        progressDialog.show(supportFragmentManager, "customProgressDialog")
+    }
+
+    private fun dismissProgressBar() {
+        val progressDialog =
+            supportFragmentManager.findFragmentByTag("customProgressDialog") as? CustomProgressDialog
+        progressDialog?.dismiss()
     }
 
     override fun onResume() {
@@ -105,6 +120,6 @@ class SetLocationPermissionActivity : AppCompatActivity() {
     override fun onBackPressed() {
         super.onBackPressed()
         finishAffinity();
-        finish()
+       // finish()
     }
 }

@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
     android:background="#F3F4FA"
-    tools:context=".view.main.home.UserProfileDetailsActivity">
+    tools:context=".view.profile.UserProfileDetailsActivity">
 
 
     <RelativeLayout

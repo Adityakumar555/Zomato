@@ -25,23 +25,23 @@
             android:name=".view.location.AddLocationFromMapActivity"
             android:exported="false" />
         <activity
-            android:name=".view.main.home.UserProfileDetailsActivity"
+            android:name=".view.profile.UserProfileDetailsActivity"
             android:exported="false" />
         <activity
-            android:name=".view.main.placeOrders.YourOrderActivity"
+            android:name=".view.orders.YourOrderActivity"
             android:exported="false" />
         <activity
-            android:name=".view.main.placeOrders.ShowCartFoodDetailsActivity"
+            android:name=".view.cart.ShowCartFoodDetailsActivity"
             android:exported="false" />
         <activity
-            android:name=".view.main.home.RestaurantDetailsActivity"
+            android:name=".view.cart.RestaurantDetailsActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
         <activity
-            android:name=".view.main.home.JoinGoldActivity"
+            android:name=".view.main.JoinGoldActivity"
             android:exported="false" />
         <activity
-            android:name=".view.main.home.ProfileActivity"
+            android:name=".view.profile.ProfileActivity"
             android:exported="false" />
         <activity
             android:name=".view.notification.EnableNotificationPermissionActivity"

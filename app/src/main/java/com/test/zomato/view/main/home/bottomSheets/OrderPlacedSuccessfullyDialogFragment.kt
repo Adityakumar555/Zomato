@@ -17,7 +17,7 @@ import com.bumptech.glide.request.target.Target
 import com.test.zomato.R
 import com.test.zomato.databinding.FragmentOrderPlacedSuccessfullyDialogBinding
 import com.test.zomato.view.main.MainActivity
-import com.test.zomato.view.main.home.interfaces.OrderPlcaeClickListener
+import com.test.zomato.view.orders.interfaces.OrderPlcaeClickListener
 
 class OrderPlacedSuccessfullyDialogFragment : DialogFragment() {
 

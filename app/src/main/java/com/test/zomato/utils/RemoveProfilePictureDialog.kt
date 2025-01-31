@@ -6,17 +6,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
-import com.test.zomato.databinding.FragmentRequestPermissionDialogBinding
 import com.test.zomato.databinding.RemoveProfilePictureDialogBinding
-import com.test.zomato.view.main.home.UserProfileDetailsActivity
-import com.test.zomato.view.main.home.interfaces.ClickEventListener
+import com.test.zomato.view.profile.UserProfileDetailsActivity
+import com.test.zomato.view.profile.interfaces.OnProfileClickListener
 
 class RemoveProfilePictureDialog : DialogFragment() {
     private lateinit var binding: RemoveProfilePictureDialogBinding
   //  private val myHelper by lazy { MyHelper(requireContext()) }
     private lateinit var myHelper: MyHelper
 
-    private var listener : ClickEventListener? = null
+    private var listener : OnProfileClickListener? = null
 
     override fun onAttach(context: Context) {
         super.onAttach(context)

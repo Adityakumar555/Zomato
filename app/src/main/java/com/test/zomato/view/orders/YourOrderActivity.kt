@@ -1,0 +1,62 @@
+package com.test.zomato.view.orders
+
+import android.graphics.Color
+import android.os.Bundle
+import android.view.View
+import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.test.zomato.databinding.ActivityYourOrderBinding
+import com.test.zomato.view.orders.adapters.OrderAdapter
+import com.test.zomato.cartDB.CartAndOrderViewModel
+import com.test.zomato.utils.AppSharedPreferences
+
+class YourOrderActivity : AppCompatActivity() {
+
+    private lateinit var binding: ActivityYourOrderBinding
+    private lateinit var roomDbViewModel: CartAndOrderViewModel
+    private lateinit var orderAdapter: OrderAdapter
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+       // enableEdgeToEdge()
+        binding = ActivityYourOrderBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
+        window.statusBarColor = Color.parseColor("#F3F4FA")
+
+
+        roomDbViewModel = ViewModelProvider(this)[CartAndOrderViewModel::class.java]
+
+        roomDbViewModel.fetchOrdersFromDb()
+
+        orderAdapter = OrderAdapter()
+
+        // Observe the orders in the database
+        roomDbViewModel.fetchOrdersInDb.observe(this) { ordersWithFoodItems ->
+            // Update the list in the adapter
+            orderAdapter.updateList(ordersWithFoodItems)
+            orderAdapter.notifyDataSetChanged()
+
+            // Check if the orders list is empty
+            if (ordersWithFoodItems.isEmpty()) {
+                binding.recyclerView.visibility = View.GONE
+                binding.emptyOrderList.visibility = View.VISIBLE
+                binding.searchLayout.visibility = View.GONE // Hide search box if no orders
+            } else {
+                binding.recyclerView.visibility = View.VISIBLE
+                binding.emptyOrderList.visibility = View.GONE
+                binding.searchLayout.visibility = View.VISIBLE
+            }
+        }
+
+        // Set up RecyclerView
+        binding.recyclerView.layoutManager = LinearLayoutManager(this)
+        binding.recyclerView.adapter = orderAdapter
+
+        // Handle back button click
+        binding.backButton.setOnClickListener {
+            finish()
+        }
+    }
+}

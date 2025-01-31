@@ -5,8 +5,10 @@ import android.content.pm.PackageManager
 import android.graphics.Color
 import android.location.Geocoder
 import android.os.Bundle
+import android.os.Handler
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.IntentSenderRequest
@@ -22,10 +24,11 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.test.zomato.R
 import com.test.zomato.databinding.ActivityAddLocationFromMapBinding
+import com.test.zomato.utils.EnableAppLocationPermissionDialogFragment
 import com.test.zomato.utils.MyHelper
+import com.test.zomato.view.location.bottomSheets.EnterCompleteAddressBottomSheetFragment
 import com.test.zomato.view.location.interfaces.SavedAddressClickListener
 import com.test.zomato.view.main.MainActivity
-import com.test.zomato.view.main.home.interfaces.ClickEventListener
 import java.io.IOException
 import java.util.Locale
 
@@ -77,7 +80,20 @@ class AddLocationFromMapActivity : AppCompatActivity(), OnMapReadyCallback,
 
 
         binding.userCurrentLocation.setOnClickListener {
-            getCurrentLocation()
+            if (myHelper.checkLocationPermission()) {
+                if (myHelper.isLocationEnable()) {
+                    if (updateAddress.isNullOrEmpty()) {
+                        getCurrentLocation()
+                    }
+
+                } else {
+                    myHelper.onGPS(resultLauncher)
+                }
+            } else {
+                myHelper.requestLocationPermission(this)  // Request location permission
+            }
+
+           // getCurrentLocation()
         }
 
         //Toast.makeText(this, "${myHelper.numberIs()}", Toast.LENGTH_SHORT).show()
@@ -136,7 +152,13 @@ class AddLocationFromMapActivity : AppCompatActivity(), OnMapReadyCallback,
             override fun afterTextChanged(s: Editable?) {
                 s?.let {
                     if (it.isNotEmpty()) {
-                        getLocationFromAddress(it.toString())
+
+                        Handler().postDelayed({
+                            getLocationFromAddress(it.toString())
+                        },1000)
+
+                    }else{
+                        getCurrentLocation()
                     }
                 }
             }
@@ -144,15 +166,15 @@ class AddLocationFromMapActivity : AppCompatActivity(), OnMapReadyCallback,
 
         val locationData =
             myHelper.extractAddressDetails(myHelper.getLatitude(), myHelper.getLongitude())
-        locationData?.let { updateLocationUI(it.block, it.fullAddress) }
+        locationData?.let {  updateLocationUI(it.block, "${it.locality},${it.state}") }
 
         if (myHelper.checkLocationPermission()) {
             if (myHelper.isLocationEnable()) {
                 if (updateAddress.isNullOrEmpty()) {
-                    getCurrentLocation()  // Fallback to current location if no address is passed
+                    getCurrentLocation()
                 }
             } else {
-                myHelper.onGPS(resultLauncher)  // Prompt user to enable GPS
+                myHelper.onGPS(resultLauncher)
             }
         } else {
             myHelper.requestLocationPermission(this)  // Request location permission
@@ -190,6 +212,9 @@ class AddLocationFromMapActivity : AppCompatActivity(), OnMapReadyCallback,
     // Function to fetch the address details from the given location
     private fun extractAddressDetails(latitude: Double, longitude: Double) {
         val location = myHelper.extractAddressDetails(latitude, longitude)
+        Log.d("selectedMapAddress", location?.fullAddress.toString())
+        Log.d("selectedMapAddress", "${location?.block},${location?.street},${location?.locality},${location?.state},${location?.subState},${location?.postalCode},${location?.country}")
+
         location?.let {
             updateLocationUI(it.block, "${it.locality},${it.state}")
 
@@ -255,20 +280,17 @@ class AddLocationFromMapActivity : AppCompatActivity(), OnMapReadyCallback,
         grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
-            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                if (!myHelper.isLocationEnable()) {
-                    myHelper.onGPS(resultLauncher)
-                } else {
-                    getCurrentLocation()
-                }
-
+        if (requestCode == 10 && grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+          //  recreate()
+            if (myHelper.isLocationEnable()) {
+                getCurrentLocation()
             } else {
-                Toast.makeText(
-                    this,
-                    "Location permission is required to get current location.",
-                    Toast.LENGTH_SHORT
-                ).show()
+                myHelper.onGPS(resultLauncher)
+            }
+        } else {
+            if (!shouldShowRequestPermissionRationale(permissions[0])) {
+                val progressDialog = EnableAppLocationPermissionDialogFragment()
+                progressDialog.show(supportFragmentManager, "requestLocationPermission")
             }
         }
     }
