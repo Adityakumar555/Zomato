@@ -13,7 +13,6 @@ import com.test.zomato.databinding.FragmentEnableDeviceLocationBottomSheetBindin
 
 class EnableDeviceLocationBottomSheetFragment : BottomSheetDialogFragment() {
 
-    // Declare the ViewBinding property using lateinit
     private lateinit var binding: FragmentEnableDeviceLocationBottomSheetBinding
     private val myHelper: MyHelper by lazy { MyHelper(requireActivity()) }
     private lateinit var resultLauncher: ActivityResultLauncher<IntentSenderRequest>
@@ -22,7 +21,6 @@ class EnableDeviceLocationBottomSheetFragment : BottomSheetDialogFragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout using ViewBinding
         binding = FragmentEnableDeviceLocationBottomSheetBinding.inflate(inflater, container, false)
 
         resultLauncher =

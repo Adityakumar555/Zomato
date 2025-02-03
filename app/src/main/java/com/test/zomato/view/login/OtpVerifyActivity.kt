@@ -77,7 +77,6 @@ class OtpVerifyActivity : AppCompatActivity() {
                     appPreferences.saveString("userNumber", number)
                 }
 
-
                 // Create a User object for the new user
                 val user = User(
                     imageUrl = null,
@@ -89,13 +88,12 @@ class OtpVerifyActivity : AppCompatActivity() {
                     gender = null
                 )
 
-
                 // Check if the user already exists in the database
                 if (number != null) {
                     userViewModel.getUserByPhoneNumber(number)
                 }
 
-                // Observe LiveData to check if the user exists
+                // check if the user exists
                 userViewModel.userLiveData.observe(this) { existingUser ->
                     binding.progressBar.visibility = View.GONE
 

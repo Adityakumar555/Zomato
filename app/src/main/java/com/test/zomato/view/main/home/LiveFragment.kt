@@ -35,7 +35,6 @@ class LiveFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        // Initialize view binding
         binding = FragmentLiveBinding.inflate(inflater, container, false)
 
         myHelper.setStatusBarIconColor(requireActivity(),true)
@@ -119,6 +118,7 @@ class LiveFragment : Fragment() {
 
     override fun onStart() {
         super.onStart()
+        // fetch user data for showing the user change image
         fetchUserData(myHelper.numberIs())
     }
 

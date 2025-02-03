@@ -26,7 +26,7 @@ class OrderAdapter : RecyclerView.Adapter<OrderAdapter.OrderViewHolder>() {
 
     fun updateList(orderList: List<OrderWithFoodItems>) {
         ordersWithFoodItems = orderList
-        notifyDataSetChanged()  // Notify the adapter that the list has changed
+        notifyDataSetChanged()
     }
 
     override fun onBindViewHolder(holder: OrderViewHolder, position: Int) {

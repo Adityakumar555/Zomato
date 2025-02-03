@@ -51,6 +51,7 @@ class ShowAllSavedAddressAdapter(
             addressMenuClickListener.addressClick(address)
         }
 
+        // show menu to delete and edit the address
         holder.binding.menuIcon.setOnClickListener {
             val popupMenu = PopupMenu(holder.itemView.context, holder.binding.menuIcon)
             popupMenu.inflate(R.menu.address_menu)

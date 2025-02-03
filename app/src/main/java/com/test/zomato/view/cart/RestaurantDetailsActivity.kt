@@ -42,7 +42,9 @@ class RestaurantDetailsActivity : AppCompatActivity(), AddFoodClickListener,
     private var restaurantDetails: RestaurantDetails? = null
     private var totalQuantity = 0
     private lateinit var updatedFoodList: MutableList<FoodItem>
-    private val selectedFilters = mutableSetOf<String>() // Store selected filters
+
+    // Store selected filters
+    private val selectedFilters = mutableSetOf<String>()
 
     private var isVeg = false
     private var isEgg = false
@@ -136,7 +138,8 @@ class RestaurantDetailsActivity : AppCompatActivity(), AddFoodClickListener,
     private fun toggleFilter(filterType: String, filterView: View) {
         // Toggle the selected filter based on the filter type
         if (selectedFilters.contains(filterType)) {
-            selectedFilters.remove(filterType) // Deselect if already selected
+            // Deselect if already selected
+            selectedFilters.remove(filterType)
             filterView.setBackgroundColor(Color.TRANSPARENT)
         } else {
             selectedFilters.add(filterType)
@@ -145,8 +148,9 @@ class RestaurantDetailsActivity : AppCompatActivity(), AddFoodClickListener,
         applyFilters()
     }
     private fun applyFilters(searchQuery: String = "") {
-
         if (selectedFilters.isEmpty()) {
+            // If selectedfilters is empty, show all food items
+
             var allFoods =
                 restaurantDetails?.recommendedFoodList?.toMutableList() ?: mutableListOf()
 
@@ -177,7 +181,7 @@ class RestaurantDetailsActivity : AppCompatActivity(), AddFoodClickListener,
                 }
             }.toMutableList()
 
-            // Apply search filter if there's any search query
+            // Apply search filter if there any search query
             if (searchQuery.isNotEmpty()) {
                 filteredList =
                     filteredList.filter { it.foodName.contains(searchQuery, ignoreCase = true) }

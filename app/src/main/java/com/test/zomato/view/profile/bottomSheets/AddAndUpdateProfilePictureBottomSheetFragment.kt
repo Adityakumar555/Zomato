@@ -42,7 +42,7 @@ class AddAndUpdateProfilePictureBottomSheetFragment : BottomSheetDialogFragment(
         // Close the bottom sheet when cancel is clicked
         binding.cancelButton.setOnClickListener { dismiss() }
 
-        // Trigger image picker
+        //select image picker
         binding.changePhoto.setOnClickListener {
             ImagePicker.with(this)
                 .crop()
@@ -53,23 +53,12 @@ class AddAndUpdateProfilePictureBottomSheetFragment : BottomSheetDialogFragment(
                 }
         }
 
-        // Handle delete photo button click
+        // delete photo button click
         binding.deletePhoto.setOnClickListener {
 
             val dialog = RemoveProfilePictureDialog()
             dialog.show(requireActivity().supportFragmentManager, "RemoveProfilePictureDialog")
 
-            /*number?.let { userViewModel.getUserByPhoneNumber(it) }
-
-            userViewModel.userLiveData.observe(viewLifecycleOwner, Observer { currentUser ->
-                currentUser?.let {
-                    // Update the imageUrl field to null
-                    userViewModel.updateUserProfile("", it.id)
-                    Toast.makeText(requireActivity(), "Profile photo deleted", Toast.LENGTH_SHORT).show()
-                    listener?.clickListener()
-                    dismiss()
-                }
-            })*/
             dismiss()
         }
 

@@ -53,7 +53,7 @@ class SplashScreen : AppCompatActivity() {
                     }
                 }
                 finish()
-            }, 1000) // Adjust delay as needed
+            }, 1000)
         }
 
 

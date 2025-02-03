@@ -68,7 +68,6 @@ class ShowCartFoodDetailsActivity : AppCompatActivity(), AddFoodClickListener,
         restaurantDetails = intent.getParcelableExtra("restaurantDetails")
 
 
-
         val isSkipBtnClick = appSharedPreferences.getBoolean("skipBtnClick")
 
         if (isSkipBtnClick) {
@@ -89,13 +88,11 @@ class ShowCartFoodDetailsActivity : AppCompatActivity(), AddFoodClickListener,
 
             } else {
 
-
-
                 mainViewModel.getAllAddresses(myHelper.numberIs())
                 mainViewModel.addresses.observe(this) { addresses ->
                     binding.selectAddressForOrder.setOnClickListener {
                         if (addresses.isNullOrEmpty()) {
-                            // If no addresses are available, start MobileNumberLoginWithSkipActivity
+                            // If no addresses are available, then navigato to add address activity
                             startActivity(
                                 Intent(
                                     this,
@@ -171,8 +168,6 @@ class ShowCartFoodDetailsActivity : AppCompatActivity(), AddFoodClickListener,
 
         }
 
-
-
         Glide.with(this)
             .load(R.drawable.party_emoji)
             .into(binding.emojiIcon)
@@ -185,7 +180,6 @@ class ShowCartFoodDetailsActivity : AppCompatActivity(), AddFoodClickListener,
         binding.addItems.setOnClickListener {
             finish()
         }
-
 
         binding.applyCoupons.setOnClickListener {
             // Apply the coupon, reduce ₹62 from the total
@@ -566,14 +560,17 @@ class ShowCartFoodDetailsActivity : AppCompatActivity(), AddFoodClickListener,
             )
         }
 
+        // insert the order details in RoomDB
         roomDbViewModel.insertOrderDetails(orderDetails, foodItemsInOrder)
 
+        // delete the orderd food from cart
         roomDbViewModel.deleteFoodItemsByRestaurantId(orderDetails.restaurantId)
 
     }
 
     override fun onRestart() {
         super.onRestart()
+        // for skip mode enter user details
         recreate()
     }
 

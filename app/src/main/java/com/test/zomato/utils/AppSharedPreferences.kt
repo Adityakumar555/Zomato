@@ -35,6 +35,7 @@ class AppSharedPreferences(context: Context) {
     fun getInt(key: String, defaultValue: Int = 0): Int {
         return sharedPreferences.getInt(key, defaultValue)
     }
+
     fun getFloat(key: String, defaultValue: Float = 0f): Float {
         return sharedPreferences.getFloat(key, defaultValue)
     }

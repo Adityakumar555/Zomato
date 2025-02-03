@@ -101,7 +101,7 @@ class AddLocationFromMapActivity : AppCompatActivity(), OnMapReadyCallback,
         //  Toast.makeText(this, "$addressId", Toast.LENGTH_SHORT).show()
 
         if (addressId != null && addressId != -1) {
-            // Handle editing the address using the addressId
+            //  editing the address using the addressId
             // Set up Add More Details button to open bottom sheet and pass the address
             binding.addMoreDetails.setOnClickListener {
                 val enterCompleteAddressBottomSheetFragment =
@@ -134,25 +134,14 @@ class AddLocationFromMapActivity : AppCompatActivity(), OnMapReadyCallback,
 
         binding.search.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(
-                charSequence: CharSequence?,
-                start: Int,
-                count: Int,
-                after: Int
-            ) {
-            }
+                charSequence: CharSequence?, start: Int, count: Int, after: Int) {}
 
             override fun onTextChanged(
-                charSequence: CharSequence?,
-                start: Int,
-                before: Int,
-                count: Int
-            ) {
-            }
+                charSequence: CharSequence?, start: Int, before: Int, count: Int) {}
 
             override fun afterTextChanged(s: Editable?) {
                 s?.let {
                     if (it.isNotEmpty()) {
-
                         Handler().postDelayed({
                             getLocationFromAddress(it.toString())
                         },1000)
@@ -250,6 +239,7 @@ class AddLocationFromMapActivity : AppCompatActivity(), OnMapReadyCallback,
         }
     }
 
+    // show addres on map using search
     private fun getLocationFromAddress(address: String) {
         try {
             val geocoder = Geocoder(this, Locale.getDefault())

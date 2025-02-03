@@ -41,7 +41,6 @@ import com.test.zomato.view.main.home.models.WhatsOnYourMindItemData
 import com.test.zomato.view.profile.ProfileActivity
 import com.test.zomato.viewModels.MainViewModel
 import java.util.Locale
-import java.util.Objects
 
 class HomeFragment : Fragment(), RestaurantsClickListener {
 
@@ -53,7 +52,6 @@ class HomeFragment : Fragment(), RestaurantsClickListener {
     private val myHelper by lazy { MyHelper(requireActivity()) }
     private lateinit var userViewModel: UserViewModel
 
-    //  private val geocoder by lazy { Geocoder(requireContext(), Locale.getDefault()) }
     private lateinit var mainViewModel: MainViewModel
 
     private lateinit var allRestaurantsAdapter: AllRestaurantsAdapter
@@ -584,6 +582,7 @@ class HomeFragment : Fragment(), RestaurantsClickListener {
     override fun onStart() {
         super.onStart()
         fetchUserData(myHelper.numberIs())
+
         // merge local saved address with current login user after delete local address from roomDB
        // mergeLocalAddressWithCurrentUserProfile()
 
@@ -592,6 +591,7 @@ class HomeFragment : Fragment(), RestaurantsClickListener {
         },300)
     }
 
+    // merge local saved address with current login user after delete local address from roomDB
     private fun mergeLocalAddressWithCurrentUserProfile() {
         mainViewModel.getAllAddresses("")
         activity?.let {

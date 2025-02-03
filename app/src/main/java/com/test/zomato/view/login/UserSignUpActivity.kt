@@ -67,7 +67,6 @@ class UserSignUpActivity : AppCompatActivity() {
         }
 
         binding.skip.setOnClickListener {
-
             val appPreferences = AppSharedPreferences(this)
             appPreferences.saveBoolean("skipBtnClick",true)
 

@@ -87,8 +87,6 @@ class EnterCompleteAddressBottomSheetFragment : BottomSheetDialogFragment() {
                 val houseAddress = binding.flatHouseNoFloorBuilding.text.toString()
                 val nearbyLandmark = binding.emailInput.text.toString()
 
-
-
                 if (houseAddress.isNullOrEmpty()) {
                     binding.flatHouseNoFloorBuilding.requestFocus()
                     Toast.makeText(activity, "Enter correct House Address.", Toast.LENGTH_SHORT)
@@ -125,14 +123,13 @@ class EnterCompleteAddressBottomSheetFragment : BottomSheetDialogFragment() {
         } else {
 
             // if user is registered
-
             binding.text5.visibility = View.VISIBLE
             binding.selectedAddressLayout.visibility = View.VISIBLE
             binding.areaSectorLocationEditTextLayout.visibility = View.GONE
             binding.receiverDetailsLayout.visibility = View.VISIBLE
 
 
-            // Handle saving user details and address
+            // saving user details and address
             binding.saveAddressInDb.setOnClickListener {
                 val receiverName = binding.receiverName.text.toString()
                 val receiverNumber = binding.receiverNumber.text.toString()
@@ -211,7 +208,6 @@ class EnterCompleteAddressBottomSheetFragment : BottomSheetDialogFragment() {
             }
 
         }
-
 
         // Set click listeners for each card
         setCardClickListeners()

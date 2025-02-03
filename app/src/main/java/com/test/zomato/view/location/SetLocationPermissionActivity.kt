@@ -47,7 +47,6 @@ class SetLocationPermissionActivity : AppCompatActivity() {
             }
         }
 
-
         binding.enableDeviceLocation.setOnClickListener {
             if (myHelper.checkLocationPermission()) {
                 if (!myHelper.isLocationEnable()) {
@@ -61,16 +60,6 @@ class SetLocationPermissionActivity : AppCompatActivity() {
         }
     }
 
-    private fun showProgressBar() {
-        val progressDialog = CustomProgressDialog()
-        progressDialog.show(supportFragmentManager, "customProgressDialog")
-    }
-
-    private fun dismissProgressBar() {
-        val progressDialog =
-            supportFragmentManager.findFragmentByTag("customProgressDialog") as? CustomProgressDialog
-        progressDialog?.dismiss()
-    }
 
     override fun onResume() {
         super.onResume()

@@ -20,7 +20,6 @@ class MobileNumberLoginWithSkipActivity : AppCompatActivity() {
 
         window.statusBarColor = Color.parseColor("#F3F4FA")
 
-
         binding.continueButton.setOnClickListener {
 
             val mobileNumber = binding.mobileNumberEditText.text.toString()

@@ -22,7 +22,6 @@ class EnableNotificationPermissionActivity : AppCompatActivity() {
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { isGranted: Boolean ->
-
         // Navigate to SetLocationActivity regardless of the permission result
         navigateToMainActivity()
     }
@@ -72,18 +71,6 @@ class EnableNotificationPermissionActivity : AppCompatActivity() {
     }
 
 
-    // Function to request notification permission
-    private fun requestNotificationPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            // Request the POST_NOTIFICATIONS permission for Android 13 and above
-            requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-        } else {
-            // For devices below Android 13, proceed to the next activity directly
-            val intent = Intent(this, SetLocationPermissionActivity::class.java)
-            startActivity(intent)
-            finish()
-        }
-    }
 
     private fun checkNotificationPermission(): Boolean {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {

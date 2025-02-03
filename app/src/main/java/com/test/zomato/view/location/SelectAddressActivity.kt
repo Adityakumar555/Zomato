@@ -72,6 +72,7 @@ class SelectAddressActivity : AppCompatActivity(), AddressMenuClickListener {
         mainViewModel = ViewModelProvider(this)[MainViewModel::class.java]
 
 
+        // initilize the sharedpresrence class to get saved value in sharedprefrence
         val appPreferences = AppSharedPreferences(this)
         val isSkipBtnClick = appPreferences.getBoolean("skipBtnClick")
 
@@ -95,9 +96,7 @@ class SelectAddressActivity : AppCompatActivity(), AddressMenuClickListener {
 
        // Toast.makeText(this, "${myHelper.numberIs()}", Toast.LENGTH_SHORT).show()
 
-
         showSavedAddressInRecyclerView()
-
 
         binding.addAddress.setOnClickListener {
             val intent = Intent(this, AddLocationFromMapActivity::class.java)
@@ -118,11 +117,8 @@ class SelectAddressActivity : AppCompatActivity(), AddressMenuClickListener {
                 } else {
                     myHelper.requestLocationPermission(this)
                 }
-
             }
-
         } else {
-
             if (myHelper.checkLocationPermission() && myHelper.isLocationEnable()) {
                     fusedLocationClient.lastLocation.addOnCompleteListener(this) { task ->
                         val location: Location? = task.result
@@ -157,7 +153,6 @@ class SelectAddressActivity : AppCompatActivity(), AddressMenuClickListener {
         binding.savedAddressRecyclerView.adapter = addressAdapter
 
 
-
     }
 
     private fun setLocationOnToolbarFromSharedprefrence() {
@@ -170,6 +165,7 @@ class SelectAddressActivity : AppCompatActivity(), AddressMenuClickListener {
 
     }
 
+    // fetch saved address in roomdb
     private fun showSavedAddressInRecyclerView() {
         binding.savedAddressProgressBar.visibility = View.VISIBLE
         binding.savedAddressRecyclerView.visibility = View.GONE
@@ -192,9 +188,7 @@ class SelectAddressActivity : AppCompatActivity(), AddressMenuClickListener {
         }
     }
 
-
-
-
+    // get nearby location from geoapify
     private fun updateTheNearbyLocationAdapter() {
         viewNearbyLocationsAdapter = ViewNearbyLocationsAdapter()
         binding.recyclerView.layoutManager = LinearLayoutManager(this)

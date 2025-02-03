@@ -109,6 +109,7 @@ class MainActivity : AppCompatActivity(), OrderPlcaeClickListener {
              }
          })
  */
+        // if user placed the order then show the success dialog
         if (intent.getBooleanExtra("showOrderDialog", false)) {
             showOrderPlacedSuccessfullyDialog()
         }
@@ -134,7 +135,6 @@ class MainActivity : AppCompatActivity(), OrderPlcaeClickListener {
     }
 
     override fun orderPlaceClick() {
-        TODO("Not yet implemented")
     }
 
     override fun orderPlacedDialogClick() {

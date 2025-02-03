@@ -281,6 +281,7 @@ class DiningFragment : Fragment() {
         }
     }
 
+    // set address that has boolean true
     private fun updateToolbarLocation() {
         val selectedAddress = getSelectedAddress()
         if (selectedAddress != null) {
@@ -296,6 +297,7 @@ class DiningFragment : Fragment() {
         return savedAddresses.find { it.addressSelected }
     }
 
+    // if user not selected the address show current address
     private fun setLocationOnToolbar() {
 
         if (myHelper.checkLocationPermission() && myHelper.isLocationEnable()) {
@@ -321,9 +323,9 @@ class DiningFragment : Fragment() {
 
     }
 
+    // get current address using save coordinates
     private fun setLocationOnToolbarFromSharedprefrence() {
-        val locationData =
-            myHelper.extractAddressDetails(myHelper.getLatitude(), myHelper.getLongitude())
+        val locationData = myHelper.extractAddressDetails(myHelper.getLatitude(), myHelper.getLongitude())
         binding.userBlockLocation.text = locationData?.block
         binding.address.text = "${locationData?.locality},${locationData?.state}"
     }

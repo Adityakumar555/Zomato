@@ -6,11 +6,7 @@ import android.os.Bundle
 import android.os.CountDownTimer
 import android.text.Editable
 import android.text.TextWatcher
-import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.widget.addTextChangedListener
-import com.test.zomato.R
 import com.test.zomato.databinding.ActivityVerifyCodeWithSkipUserBinding
 import com.test.zomato.utils.AppSharedPreferences
 
@@ -19,7 +15,7 @@ class VerifyCodeWithSkipUserActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // enableEdgeToEdge() // Uncomment this if you want edge-to-edge UI
+        // enableEdgeToEdge()
         binding = ActivityVerifyCodeWithSkipUserBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -27,7 +23,6 @@ class VerifyCodeWithSkipUserActivity : AppCompatActivity() {
 
         val mobileNumber = intent?.getStringExtra("skipUserNumber") ?: ""
         val skipUserName = intent?.getStringExtra("skipUserName") ?: ""
-
 
         val appSharedPreferences = AppSharedPreferences(this)
 
@@ -42,12 +37,8 @@ class VerifyCodeWithSkipUserActivity : AppCompatActivity() {
         }
 
         binding.enterOTP.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-
-            }
-
-            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-            }
+            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
+            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
 
             override fun afterTextChanged(p0: Editable?) {
                 val otpText = p0.toString().trim()
@@ -70,7 +61,8 @@ class VerifyCodeWithSkipUserActivity : AppCompatActivity() {
     }
 
     private fun startResendTimer() {
-        object : CountDownTimer(30000, 1000) { // 30 seconds timer with 1 second interval
+        // 30 seconds timer
+        object : CountDownTimer(30000, 1000) {
             override fun onTick(millisUntilFinished: Long) {
                 binding.resendOtpTime.text = "Resend in ${millisUntilFinished / 1000} sec"
             }

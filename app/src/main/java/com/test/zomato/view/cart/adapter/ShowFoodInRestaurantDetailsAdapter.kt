@@ -51,14 +51,14 @@ class ShowFoodInRestaurantDetailsAdapter(
             holder.binding.veg.setImageResource(R.drawable.non_veg_icon)
         }
 
-        // Handle visibility of counter and add food card based on the quantity
+        // visibility of counter and add food card based on the quantity
         updateFoodVisibility(holder, foodItem)
 
         holder.binding.addFood.setOnClickListener {
             addFoodClickListener.onFoodClick(foodItem)
         }
 
-        // Handle increment and decrement actions for the counter
+        //  increment and decrement actions for the counter
         holder.binding.incrementCount.setOnClickListener {
             foodItem.foodQuantity++
             // Update food quantity in the database
