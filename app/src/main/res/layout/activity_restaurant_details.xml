@@ -52,12 +52,87 @@
 
     </RelativeLayout>
 
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/search_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="44dp"
+            android:layout_below="@id/toolbar"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginEnd="12dp"
+            app:cardBackgroundColor="@color/white"
+            app:cardElevation="6dp"
+            app:strokeWidth="0dp">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <ImageView
+                    android:id="@+id/search_icon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="12dp"
+                    android:background="@drawable/baseline_search_24"
+                    android:backgroundTint="@color/colorPrimary"
+                    android:scaleType="fitXY" />
+
+
+                <EditText
+                    android:id="@+id/search"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="50dp"
+                    android:layout_toEndOf="@id/search_icon"
+                    android:background="@null"
+                    android:gravity="center_vertical"
+                    android:hint="Search Food"
+                    android:textSize="16sp" />
+
+                <com.google.android.material.divider.MaterialDivider
+                    android:id="@+id/search_divider"
+                    android:layout_width="1dp"
+                    android:layout_height="match_parent"
+                    android:layout_alignEnd="@id/search"
+                    android:layout_marginStart="6dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="10dp" />
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_toEndOf="@id/search_divider">
+
+                    <ImageView
+                        android:id="@+id/mic_icon"
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:layout_centerInParent="true"
+                        android:layout_centerVertical="true"
+                        android:background="@drawable/mic_icon"
+                        android:backgroundTint="@color/colorPrimary"
+                        android:scaleType="fitXY" />
+
+                </RelativeLayout>
+
+
+            </RelativeLayout>
+
+
+        </com.google.android.material.card.MaterialCardView>
+
+
+
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:id="@+id/scrollView"
+        android:layout_marginTop="12dp"
         android:layout_above="@id/order_item_count_layout"
         android:layout_height="wrap_content"
-        android:layout_below="@id/toolbar"
+        android:layout_below="@id/search_layout"
         android:fillViewport="true">
 
         <RelativeLayout
@@ -341,6 +416,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="32dp"
                             android:layout_marginStart="12dp"
+                            android:visibility="gone"
                             android:layout_marginTop="4dp"
                             android:layout_marginEnd="4dp"
                             android:layout_marginBottom="4dp"
@@ -391,7 +467,7 @@
 
                         <!-- Chip 2 - Veg -->
                         <com.google.android.material.card.MaterialCardView
-                            android:id="@+id/chip_2"
+                            android:id="@+id/veg_chips"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_margin="4dp"
@@ -434,7 +510,7 @@
 
                         <!-- Chip 3 - Egg -->
                         <com.google.android.material.card.MaterialCardView
-                            android:id="@+id/chip_3"
+                            android:id="@+id/egg_chips"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_margin="4dp"
@@ -476,7 +552,7 @@
 
                         <!-- Chip 4 - Non-Veg -->
                         <com.google.android.material.card.MaterialCardView
-                            android:id="@+id/chip_4"
+                            android:id="@+id/nonVeg_chips"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_margin="4dp"
@@ -522,6 +598,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_margin="4dp"
+                            android:visibility="gone"
                             app:cardBackgroundColor="@color/white"
                             app:cardCornerRadius="6dp"
                             app:cardElevation="1dp">
@@ -560,7 +637,7 @@
 
                         <!-- Chip 6 - Rated -->
                         <com.google.android.material.card.MaterialCardView
-                            android:id="@+id/chip_6"
+                            android:id="@+id/fourPlusRatedFood"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_margin="4dp"
@@ -607,6 +684,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_margin="4dp"
+                            android:visibility="gone"
                             app:cardBackgroundColor="@color/white"
                             app:cardCornerRadius="6dp"
                             app:cardElevation="1dp">
@@ -645,7 +723,7 @@
 
                         <!-- Chip 8 - Sweets -->
                         <com.google.android.material.card.MaterialCardView
-                            android:id="@+id/chip_8"
+                            android:id="@+id/sweets"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_margin="4dp"
@@ -736,6 +814,17 @@
                     android:layout_marginBottom="22dp"
                     android:layout_below="@id/recommended_for_you"
                     android:visibility="visible" />
+
+                <TextView
+                    android:id="@+id/noFoodAvailable"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    android:layout_below="@id/recommended_for_you"
+                    android:layout_centerHorizontal="true"
+                    android:textSize="22dp"
+                    android:layout_marginTop="55dp"
+                    android:text="No Food Available"/>
 
                 <com.google.android.material.divider.MaterialDivider
                     android:id="@+id/divider4"

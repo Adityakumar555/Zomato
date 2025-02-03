@@ -61,10 +61,6 @@ class FoodItemInCartAdapter(
             Toast.makeText(holder.itemView.context, "Edit item clicked", Toast.LENGTH_SHORT).show()
         }
 
-
-        if (position==foodItems.size-1){
-            holder.binding.dottedLine.visibility = View.GONE
-        }
     }
 
     override fun getItemCount(): Int = foodItems.size

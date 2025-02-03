@@ -70,6 +70,7 @@ class EnterCompleteAddressBottomSheetFragment : BottomSheetDialogFragment() {
         val appPreferences = activity?.let { AppSharedPreferences(it) }
         val isSkipBtnClick = appPreferences?.getBoolean("skipBtnClick")
 
+        // if user click on skip btn
         if (isSkipBtnClick == true) {
 
             binding.areaSectorLocationEditText.setText(selectedAddress)
@@ -122,6 +123,9 @@ class EnterCompleteAddressBottomSheetFragment : BottomSheetDialogFragment() {
             }
 
         } else {
+
+            // if user is registered
+
             binding.text5.visibility = View.VISIBLE
             binding.selectedAddressLayout.visibility = View.VISIBLE
             binding.areaSectorLocationEditTextLayout.visibility = View.GONE

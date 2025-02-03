@@ -147,47 +147,6 @@
 
         </RelativeLayout>
 
-        <RelativeLayout
-            android:id="@+id/add_items"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/food_cart_item"
-            android:layout_marginEnd="16dp"
-            android:layout_marginBottom="12dp"
-            android:gravity="center">
-
-            <ImageView
-                android:id="@+id/add_icon"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_alignParentStart="true"
-                android:layout_centerVertical="true"
-                android:layout_marginStart="8dp"
-                android:background="@drawable/add_icon"
-                android:backgroundTint="@color/colorPrimary" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerHorizontal="true"
-                android:layout_centerVertical="true"
-                android:layout_marginStart="4dp"
-                android:layout_toEndOf="@id/add_icon"
-                android:text="Add items"
-                android:textColor="@color/colorPrimary"
-                android:textSize="18sp" />
-        </RelativeLayout>
-
-        <ImageView
-            android:id="@+id/dotted_line"
-            android:layout_width="match_parent"
-            android:layout_height="5dp"
-            android:layout_below="@id/add_items"
-            android:layout_marginStart="12dp"
-            android:layout_marginEnd="12dp"
-            android:layout_marginBottom="6dp"
-            android:layerType="software"
-            android:src="@drawable/dotted_line" />
 
 
     </RelativeLayout>

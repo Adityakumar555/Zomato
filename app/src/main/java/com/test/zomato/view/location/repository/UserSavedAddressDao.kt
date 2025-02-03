@@ -20,13 +20,19 @@ interface UserSavedAddressDao {
     @Update
     suspend fun updateAddress(address: UserSavedAddress)
 
-    @Delete
-    suspend fun deleteAddress(address: UserSavedAddress)
+    @Query("delete from user_saved_address where id=:addressId")
+    suspend fun deleteAddress(addressId: Int)
 
     @Query("DELETE FROM user_saved_address WHERE currentUserNumber = :currentUserNumber")
     suspend fun deleteAddressesWithUserNumber(currentUserNumber: String)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertMultipleAddresses(addresses: List<UserSavedAddress>)
+
+
+    @Query("UPDATE user_saved_address SET addressSelected = :status WHERE currentUserNumber = :userPhoneNumber")
+    suspend fun updateAddressSelectedStatus(userPhoneNumber: String, status: Boolean)
+
+
 
 }

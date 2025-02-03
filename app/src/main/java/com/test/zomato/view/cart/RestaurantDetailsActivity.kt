@@ -1,14 +1,19 @@
 package com.test.zomato.view.cart
 
+import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.speech.RecognizerIntent
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -24,6 +29,7 @@ import com.test.zomato.view.main.home.models.RestaurantDetails
 import nl.dionsegijn.konfetti.core.Party
 import nl.dionsegijn.konfetti.core.Position
 import nl.dionsegijn.konfetti.core.emitter.Emitter
+import java.util.Locale
 import java.util.concurrent.TimeUnit
 
 class RestaurantDetailsActivity : AppCompatActivity(), AddFoodClickListener,
@@ -35,7 +41,17 @@ class RestaurantDetailsActivity : AppCompatActivity(), AddFoodClickListener,
     private var currentRestaurantId: Int? = null
     private var restaurantDetails: RestaurantDetails? = null
     private var totalQuantity = 0
-    private lateinit var updatedFoodList: MutableList<FoodItem> // Make it mutable
+    private lateinit var updatedFoodList: MutableList<FoodItem>
+    private val selectedFilters = mutableSetOf<String>() // Store selected filters
+
+    private var isVeg = false
+    private var isEgg = false
+    private var isNonVeg = false
+    private var isRated4Plus = false
+    private var isSweet = false
+
+
+    private val REQUEST_CODE_SPEECH_INPUT = 10
 
     var isOpen = false
 
@@ -47,13 +63,11 @@ class RestaurantDetailsActivity : AppCompatActivity(), AddFoodClickListener,
 
         window.statusBarColor = Color.WHITE
 
-
+        roomDbViewModel = ViewModelProvider(this)[CartAndOrderViewModel::class.java]
 
         binding.backButton.setOnClickListener {
             finish()
         }
-
-        roomDbViewModel = ViewModelProvider(this)[CartAndOrderViewModel::class.java]
 
         // Retrieve restaurant details from intent
         restaurantDetails = intent.getParcelableExtra("restaurantDetails")
@@ -74,12 +88,119 @@ class RestaurantDetailsActivity : AppCompatActivity(), AddFoodClickListener,
 
                 // Fetch food items for the current restaurant and update UI
                 fetchAndMergeFoodItems(it)
+
+                binding.micIcon.setOnClickListener {
+                    // Create an intent for speech recognition
+                    val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
+                        putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+                        putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault())
+                        putExtra(RecognizerIntent.EXTRA_PROMPT, "Speak to text")
+                    }
+
+                    try {
+                        startActivityForResult(intent, REQUEST_CODE_SPEECH_INPUT)
+                    } catch (e: ActivityNotFoundException) {
+                        Toast.makeText(this, "Speech recognition is not supported on this device.", Toast.LENGTH_SHORT).show()
+                    }
+                }
+
+                binding.search.addTextChangedListener(object : TextWatcher {
+                    override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                    }
+
+                    override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                    }
+
+                    override fun afterTextChanged(p0: Editable?) {
+                        val foodName = p0.toString().trim()
+
+                        applyFilters(foodName)
+
+
+                    }
+                })
+
+
+                binding.vegChips.setOnClickListener { toggleFilter("veg", binding.vegChips) }
+                binding.eggChips.setOnClickListener { toggleFilter("egg", binding.eggChips) }
+                binding.nonVegChips.setOnClickListener { toggleFilter("nonVeg", binding.nonVegChips) }
+                binding.fourPlusRatedFood.setOnClickListener { toggleFilter("rated4Plus", binding.fourPlusRatedFood) }
+                binding.sweets.setOnClickListener { toggleFilter("sweet", binding.sweets) }
             }
 
             // Setup the expand/collapse functionality for food list
             expendAndCollapse()
         }
     }
+
+    private fun toggleFilter(filterType: String, filterView: View) {
+        // Toggle the selected filter based on the filter type
+        if (selectedFilters.contains(filterType)) {
+            selectedFilters.remove(filterType) // Deselect if already selected
+            filterView.setBackgroundColor(Color.TRANSPARENT)
+        } else {
+            selectedFilters.add(filterType)
+            filterView.setBackgroundColor(ContextCompat.getColor(this, R.color.colorPrimary))
+        }
+        applyFilters()
+    }
+    private fun applyFilters(searchQuery: String = "") {
+
+        if (selectedFilters.isEmpty()) {
+            var allFoods =
+                restaurantDetails?.recommendedFoodList?.toMutableList() ?: mutableListOf()
+
+            if (searchQuery.isNotEmpty()) {
+                allFoods =
+                    allFoods.filter { it.foodName.contains(searchQuery, ignoreCase = true) }
+                        .toMutableList()
+            }
+
+            updatedFoodList = allFoods
+
+        } else {
+            // If no filters are selected, show all food items
+            var filteredList =
+                restaurantDetails?.recommendedFoodList?.toMutableList() ?: mutableListOf()
+
+            // Filter based on selected filters
+            filteredList = filteredList.filter { foodItem ->
+                selectedFilters.any { filterType ->
+                    when (filterType) {
+                        "veg" -> foodItem.foodType == "Veg"
+                        "egg" -> foodItem.eggFood
+                        "nonVeg" -> foodItem.foodType == "Non-Veg"
+                        "rated4Plus" -> foodItem.foodRating >= 4
+                        "sweet" -> foodItem.sweetFood
+                        else -> false
+                    }
+                }
+            }.toMutableList()
+
+            // Apply search filter if there's any search query
+            if (searchQuery.isNotEmpty()) {
+                filteredList =
+                    filteredList.filter { it.foodName.contains(searchQuery, ignoreCase = true) }
+                        .toMutableList()
+            }
+
+            updatedFoodList = filteredList
+        }
+
+        if (updatedFoodList.isEmpty()){
+            binding.noFoodAvailable.visibility = View.VISIBLE
+            binding.recyclerView.visibility = View.GONE
+        }else{
+            binding.noFoodAvailable.visibility = View.GONE
+            binding.recyclerView.visibility = View.VISIBLE
+
+            // Update the updated food list and refresh the adapter
+            showFoodInRestaurantDetailsAdapter.updateList(updatedFoodList)
+            showFoodInRestaurantDetailsAdapter.notifyDataSetChanged()
+
+        }
+        }
+
 
     private fun fetchAndMergeFoodItems(restaurantDetails: RestaurantDetails) {
         roomDbViewModel.fetchAndUpdateCartItems()
@@ -101,10 +222,15 @@ class RestaurantDetailsActivity : AppCompatActivity(), AddFoodClickListener,
             updateCartItemCount(totalQuantity)
 
             if (updatedFoodList.isNotEmpty()) {
+                binding.noFoodAvailable.visibility = View.GONE
+                binding.recyclerView.visibility = View.VISIBLE
+
                 showFoodInRestaurantDetailsAdapter = ShowFoodInRestaurantDetailsAdapter(updatedFoodList, this)
                 binding.recyclerView.layoutManager = LinearLayoutManager(this)
                 binding.recyclerView.adapter = showFoodInRestaurantDetailsAdapter
             } else {
+                binding.noFoodAvailable.visibility = View.VISIBLE
+                binding.recyclerView.visibility = View.GONE
                 Toast.makeText(this, "No recommended food items available", Toast.LENGTH_SHORT).show()
             }
         })
@@ -201,5 +327,23 @@ class RestaurantDetailsActivity : AppCompatActivity(), AddFoodClickListener,
         roomDbViewModel.fetchAndUpdateCartItems()
         showFoodInRestaurantDetailsAdapter.notifyDataSetChanged()
     }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == REQUEST_CODE_SPEECH_INPUT) {
+            if (resultCode == RESULT_OK && data != null) {
+                // Extract the result from the data
+                val result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
+                if (!result.isNullOrEmpty()) {
+                    // Set the recognized speech text to the search EditText
+                    binding.search.setText(result[0])
+                } else {
+                    Toast.makeText(this, "No speech input recognized", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+
 }
 

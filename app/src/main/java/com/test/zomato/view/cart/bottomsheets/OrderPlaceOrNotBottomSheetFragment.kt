@@ -1,4 +1,4 @@
-package com.test.zomato.view.main.home.bottomSheets
+package com.test.zomato.view.cart.bottomsheets
 
 import android.content.Context
 import android.os.Bundle
@@ -42,10 +42,7 @@ class OrderPlaceOrNotBottomSheetFragment : BottomSheetDialogFragment() {
         val location = arguments?.getString("location")
         val totalPrice = arguments?.getDouble("totalPrice")
 
-        // Set the data to the UI components
-        location?.let {
-            binding.location.text = it
-        }
+        location?.let { binding.location.text = it }
 
         totalPrice?.let {
             binding.deliveryTime.text = "Pay ₹${it.toInt()} cash on delivery"
@@ -89,7 +86,6 @@ class OrderPlaceOrNotBottomSheetFragment : BottomSheetDialogFragment() {
 
     override fun onDetach() {
         super.onDetach()
-        // Clean up to avoid memory leaks
         progressRunnable?.let { handler?.removeCallbacks(it) }
     }
 }

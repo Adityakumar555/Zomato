@@ -1,8 +1,12 @@
 package com.test.zomato.view.main.home
 
+import android.app.Activity.RESULT_OK
+import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.location.Location
 import android.os.Bundle
+import android.os.Handler
+import android.speech.RecognizerIntent
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
@@ -22,20 +26,22 @@ import com.test.zomato.utils.AppSharedPreferences
 import com.test.zomato.utils.EnableDeviceLocationBottomSheetFragment
 import com.test.zomato.utils.MyHelper
 import com.test.zomato.view.cart.RestaurantDetailsActivity
+import com.test.zomato.view.cart.interfaces.RestaurantsClickListener
 import com.test.zomato.view.location.SelectAddressActivity
 import com.test.zomato.view.location.models.UserSavedAddress
 import com.test.zomato.view.login.repository.UserViewModel
+import com.test.zomato.view.main.JoinGoldActivity
 import com.test.zomato.view.main.home.adapter.AllRestaurantsAdapter
 import com.test.zomato.view.main.home.adapter.ExploreItemAdapter
 import com.test.zomato.view.main.home.adapter.WhatsOnYourMindItemAdapter
-import com.test.zomato.view.cart.interfaces.RestaurantsClickListener
-import com.test.zomato.view.main.JoinGoldActivity
 import com.test.zomato.view.main.home.models.ExploreData
 import com.test.zomato.view.main.home.models.FoodItem
 import com.test.zomato.view.main.home.models.RestaurantDetails
 import com.test.zomato.view.main.home.models.WhatsOnYourMindItemData
 import com.test.zomato.view.profile.ProfileActivity
 import com.test.zomato.viewModels.MainViewModel
+import java.util.Locale
+import java.util.Objects
 
 class HomeFragment : Fragment(), RestaurantsClickListener {
 
@@ -54,6 +60,7 @@ class HomeFragment : Fragment(), RestaurantsClickListener {
     private lateinit var fusedLocationClient: FusedLocationProviderClient
 
     private lateinit var savedAddresses: List<UserSavedAddress>
+    private val REQUEST_CODE_SPEECH_INPUT = 10
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -67,8 +74,6 @@ class HomeFragment : Fragment(), RestaurantsClickListener {
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
 
 
-        setLocationOnToolbar()
-        fetchUserData(myHelper.numberIs())
 
         val appPreferences = activity?.let { AppSharedPreferences(it) }
         val isSkipBtnClick = appPreferences?.getBoolean("skipBtnClick")
@@ -93,16 +98,7 @@ class HomeFragment : Fragment(), RestaurantsClickListener {
             binding.menuIcon.visibility = View.GONE
 
             // merge local saved address with current login user after delete local address from roomDB
-            mainViewModel.getAllAddresses("")
-            activity?.let {
-                mainViewModel.addresses.observe(it) { addresses ->
-                    if (addresses.isNotEmpty()) {
-                        val localSavedAddress =
-                            addresses.map { it.copy(currentUserNumber = myHelper.numberIs()) }
-                        mainViewModel.saveAddressesForUser(localSavedAddress)
-                    }
-                }
-            }
+            mergeLocalAddressWithCurrentUserProfile()
         }
 
         //Toast.makeText(requireActivity(), "${myHelper.numberIs()}", Toast.LENGTH_SHORT).show()
@@ -297,8 +293,10 @@ class HomeFragment : Fragment(), RestaurantsClickListener {
                         foodQuantity = 0,
                         restaurantId = 1,
                         restaurantName = "The Postman Kitchen",
-                        foodOffer = "37",  // Offer in rupees
-                        foodSize = "Full"
+                        foodOffer = "37",
+                        foodSize = "Full",
+                        eggFood = false,
+                        sweetFood = false
                     ),
                     FoodItem(
                         id = 102,
@@ -312,8 +310,10 @@ class HomeFragment : Fragment(), RestaurantsClickListener {
                         foodQuantity = 0,
                         restaurantId = 1,
                         restaurantName = "The Postman Kitchen",
-                        foodOffer = "25",  // Offer in rupees
-                        foodSize = "Small"
+                        foodOffer = "25",
+                        foodSize = "Small",
+                        eggFood = false,
+                        sweetFood = false
                     )
                 )
             ),
@@ -352,8 +352,10 @@ class HomeFragment : Fragment(), RestaurantsClickListener {
                         foodQuantity = 0,
                         restaurantId = 2,
                         restaurantName = "Bistro 24",
-                        foodOffer = "40",  // Offer in rupees
-                        foodSize = "Medium"
+                        foodOffer = "40",
+                        foodSize = "Medium",
+                        eggFood = false,
+                        sweetFood = false
                     ),
                     FoodItem(
                         id = 104,
@@ -367,8 +369,10 @@ class HomeFragment : Fragment(), RestaurantsClickListener {
                         foodQuantity = 0,
                         restaurantId = 2,
                         restaurantName = "Bistro 24",
-                        foodOffer = "30",  // Offer in rupees
-                        foodSize = "Large"
+                        foodOffer = "30",
+                        foodSize = "Large",
+                        eggFood = false,
+                        sweetFood = false
                     )
                 )
             ),
@@ -407,8 +411,10 @@ class HomeFragment : Fragment(), RestaurantsClickListener {
                         foodQuantity = 0,
                         restaurantId = 3,
                         restaurantName = "Spice Haven",
-                        foodOffer = "50",  // Offer in rupees
-                        foodSize = "Full"
+                        foodOffer = "50",
+                        foodSize = "Full",
+                        eggFood = false,
+                        sweetFood = false
                     ),
                     FoodItem(
                         id = 106,
@@ -422,8 +428,10 @@ class HomeFragment : Fragment(), RestaurantsClickListener {
                         foodQuantity = 0,
                         restaurantId = 3,
                         restaurantName = "Spice Haven",
-                        foodOffer = "20",  // Offer in rupees
-                        foodSize = "Small"
+                        foodOffer = "20",
+                        foodSize = "Small",
+                        eggFood = false,
+                        sweetFood = false
                     )
                 )
             ),
@@ -462,8 +470,10 @@ class HomeFragment : Fragment(), RestaurantsClickListener {
                         foodQuantity = 0,
                         restaurantId = 4,
                         restaurantName = "Urban Grill",
-                        foodOffer = "25",  // Offer in rupees
-                        foodSize = "Large"
+                        foodOffer = "25",
+                        foodSize = "Large",
+                        eggFood = false,
+                        sweetFood = false
                     ),
                     FoodItem(
                         id = 108,
@@ -477,17 +487,38 @@ class HomeFragment : Fragment(), RestaurantsClickListener {
                         foodQuantity = 0,
                         restaurantId = 4,
                         restaurantName = "Urban Grill",
-                        foodOffer = "15",  // Offer in rupees
-                        foodSize = "Small"
+                        foodOffer = "15",
+                        foodSize = "Small",
+                        eggFood = false,
+                        sweetFood = false
                     )
                 )
             )
         )
 
 
+
         allRestaurantsAdapter = AllRestaurantsAdapter(restaurants, this)
         binding.recyclerView3.layoutManager = LinearLayoutManager(context)
         binding.recyclerView3.adapter = allRestaurantsAdapter
+
+
+        binding.micIcon.setOnClickListener {
+                // Create an intent for speech recognition
+                val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
+                    putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+                    putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault())
+                    putExtra(RecognizerIntent.EXTRA_PROMPT, "Speak to text")
+                }
+
+                try {
+                    startActivityForResult(intent, REQUEST_CODE_SPEECH_INPUT)
+                } catch (e: ActivityNotFoundException) {
+                    Toast.makeText(activity, "Speech recognition is not supported on this device.", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+
 
         binding.search.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
@@ -498,9 +529,7 @@ class HomeFragment : Fragment(), RestaurantsClickListener {
                 val searchText = p0.toString().trim()
 
                 val list = if (searchText.isNotEmpty()) {
-                    restaurants.filter {
-                        it.restaurantName.contains(
-                            searchText,
+                    restaurants.filter { it.restaurantName.contains(searchText,
                             ignoreCase = true
                         ) || it.recommendedFoodList[0].foodName.contains(
                             searchText,
@@ -517,20 +546,63 @@ class HomeFragment : Fragment(), RestaurantsClickListener {
         })
 
 
-        /* // Observe the LiveData for saved addresses
-         mainViewModel.addresses.observe(viewLifecycleOwner) { addresses ->
-             savedAddresses = addresses
-             updateToolbarLocation()
-         }*/
+        mainViewModel.getAllAddresses(myHelper.numberIs())
+        // Observe the LiveData for saved addresses
+        mainViewModel.addresses.observe(viewLifecycleOwner) { addresses ->
+            if (addresses.isNotEmpty()) {
+                savedAddresses = addresses
+                updateToolbarLocation()
+            }else{
+                setLocationOnToolbar()
+            }
+        }
 
 
         return binding.root
     }
 
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == REQUEST_CODE_SPEECH_INPUT) {
+            if (resultCode == RESULT_OK && data != null) {
+                // Extract the result from the data
+                val result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
+                if (!result.isNullOrEmpty()) {
+                    // Set the recognized speech text to the search EditText
+                    binding.search.setText(result[0])
+                } else {
+                    Toast.makeText(activity, "No speech input recognized", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+
+
+
     override fun onStart() {
         super.onStart()
         fetchUserData(myHelper.numberIs())
+        // merge local saved address with current login user after delete local address from roomDB
+       // mergeLocalAddressWithCurrentUserProfile()
+
+        Handler().postDelayed({
+            mainViewModel.getAllAddresses(myHelper.numberIs())
+        },300)
+    }
+
+    private fun mergeLocalAddressWithCurrentUserProfile() {
+        mainViewModel.getAllAddresses("")
+        activity?.let {
+            mainViewModel.addresses.observe(it) { addresses ->
+                if (addresses.isNotEmpty()) {
+                    val localSavedAddress =
+                        addresses.map { it.copy(currentUserNumber = myHelper.numberIs()) }
+                    mainViewModel.saveAddressesForUser(localSavedAddress)
+                }
+            }
+        }
     }
 
 
@@ -558,42 +630,32 @@ class HomeFragment : Fragment(), RestaurantsClickListener {
 
     }
 
-    /* private fun updateToolbarLocation() {
-         val selectedAddress = getSelectedAddress()
-         if (selectedAddress != null) {
-             // Display the selected address in the toolbar
-             binding.userBlockLocation.text = selectedAddress.selectedLocation
-             binding.address.text = "${selectedAddress.houseAddress}, ${selectedAddress.nearbyLandmark}"
-         } else {
-             // If no selected address, display current location
-             setLocationOnToolbar()
-         }
-     }*/
+    private fun updateToolbarLocation() {
+        val selectedAddress = getSelectedAddress()
+        if (selectedAddress != null) {
+            val address = selectedAddress.selectedLocation.split(",")
+            binding.userBlockLocation.text = address[0]
+            binding.address.text = "${address[1]}, ${address[2]}"
+        } else {
+            setLocationOnToolbar()
+        }
+    }
 
-    /* private fun getSelectedAddress(): UserSavedAddress? {
-         // Check if any address has `addressSelected` as true
-         return savedAddresses.find { it.addressSelected }
-     }*/
-
+    private fun getSelectedAddress(): UserSavedAddress? {
+        return savedAddresses.find { it.addressSelected }
+    }
 
     private fun setLocationOnToolbar() {
-        Log.d("currentuserlatlong_out", "aaya hai")
-
         if (myHelper.checkLocationPermission() && myHelper.isLocationEnable()) {
             try {
                 activity?.let {
                     fusedLocationClient.lastLocation.addOnCompleteListener(it) { task ->
                         val location: Location? = task.result
                         if (location != null) {
-
-                            Log.d("currentuserlatlong", "${location.latitude},${location.latitude}")
-
-                            val locationData =
-                                myHelper.extractAddressDetails(location.latitude, location.longitude)
-
-                            Log.d("userAddress", "${locationData?.fullAddress}")
-
-                           // if (location)
+                            val locationData = myHelper.extractAddressDetails(
+                                location.latitude,
+                                location.longitude
+                            )
                             binding.userBlockLocation.text = locationData?.block
                             binding.address.text = "${locationData?.locality},${locationData?.state}"
                         } else {
@@ -601,26 +663,22 @@ class HomeFragment : Fragment(), RestaurantsClickListener {
                         }
                     }
                 }
-            }catch (e:Exception){
+            } catch (e: Exception) {
                 Toast.makeText(context, "GPS is not working properly", Toast.LENGTH_SHORT).show()
             }
-
         } else {
             setLocationOnToolbarFromSharedprefrence()
-            Log.d("currentuserlatlong_out", "location nahi chala")
-
         }
-
     }
 
     private fun setLocationOnToolbarFromSharedprefrence() {
-        Log.d("currentuserlatlong_out", "location set hone aaya hai")
-
         val locationData =
             myHelper.extractAddressDetails(myHelper.getLatitude(), myHelper.getLongitude())
         binding.userBlockLocation.text = locationData?.block
         binding.address.text = "${locationData?.locality},${locationData?.state}"
     }
+
+
 
     override fun onRestaurantsClick(restaurantDetails: RestaurantDetails) {
         val intent = Intent(context, RestaurantDetailsActivity::class.java)

@@ -74,7 +74,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginStart="8dp"
-                android:layout_marginEnd="50dp"
                 android:layout_toEndOf="@id/search_icon"
                 android:background="@null"
                 android:gravity="center_vertical"
@@ -140,11 +139,12 @@
 
                     <TextView
                         android:id="@+id/text5"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_below="@id/text1"
                         android:layout_marginStart="12dp"
                         android:layout_marginTop="6dp"
+                        android:layout_marginEnd="80dp"
                         android:layout_toEndOf="@id/my_location"
                         android:fontFamily="@font/metropolis_regular"
                         android:lineSpacingExtra="4dp"
@@ -154,6 +154,7 @@
                         android:textStyle="bold" />
 
                     <RelativeLayout
+                        android:id="@+id/enableLocationView"
                         android:layout_width="wrap_content"
                         android:layout_above="@id/divider_view"
                         android:layout_alignParentTop="true"

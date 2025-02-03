@@ -12,8 +12,8 @@ class UserSavedAddressRepository(private val userSavedAddressDao: UserSavedAddre
         return userSavedAddressDao.getAllAddresses(numberIs)
     }
 
-    suspend fun deleteAddress(userSavedAddress: UserSavedAddress){
-        return userSavedAddressDao.deleteAddress(userSavedAddress)
+    suspend fun deleteAddress(addressId: Int) {
+        return userSavedAddressDao.deleteAddress(addressId)
     }
 
     suspend fun updateAddress(userSavedAddress: UserSavedAddress){
@@ -27,5 +27,11 @@ class UserSavedAddressRepository(private val userSavedAddressDao: UserSavedAddre
     suspend fun saveMultipleAddresses(addresses: List<UserSavedAddress>) {
         userSavedAddressDao.insertMultipleAddresses(addresses)
     }
+
+    suspend fun updateAllAddressesToNotSelected(userPhoneNumber: String) {
+        // Update all addresses to set addressSelected = false for the given user
+        userSavedAddressDao.updateAddressSelectedStatus(userPhoneNumber, false)
+    }
+
 
 }

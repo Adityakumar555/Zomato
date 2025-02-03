@@ -1,4 +1,4 @@
-package com.test.zomato.view.main.home.bottomSheets
+package com.test.zomato.view.orders.bottomSheets
 
 import android.content.Context
 import android.os.Bundle
@@ -33,15 +33,13 @@ class OrderPlacedSuccessfullyDialogFragment : DialogFragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
         binding = FragmentOrderPlacedSuccessfullyDialogBinding.inflate(inflater, container, false)
 
         // Glide.with(SplashScreenActivity.this).load(R.drawable.note_splash_screen).into(binding.splashIcon);
 
-        // show note gif in splash onboarding
         Glide.with(this)
             .asGif()
-            .load(R.drawable.order_placed_successfull) // .apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.NONE))
+            .load(R.drawable.order_placed_successfull)
             .listener(object : RequestListener<GifDrawable?> {
 
                 override fun onLoadFailed(

@@ -11,7 +11,10 @@ import com.test.zomato.databinding.SavedAddressItemBinding
 import com.test.zomato.view.location.interfaces.AddressMenuClickListener
 import com.test.zomato.view.location.models.UserSavedAddress
 
-class ShowAllSavedAddressAdapter(private val addressMenuClickListener: AddressMenuClickListener) :
+class ShowAllSavedAddressAdapter(
+    private val addressMenuClickListener: AddressMenuClickListener,
+    private val showAddressType: String
+) :
     RecyclerView.Adapter<ShowAllSavedAddressAdapter.ViewHolder>() {
 
     private var addressList = listOf<UserSavedAddress>()
@@ -26,6 +29,14 @@ class ShowAllSavedAddressAdapter(private val addressMenuClickListener: AddressMe
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val address = addressList[position]
+
+        if (showAddressType=="selectedLocationForOrder"){
+            holder.binding.orderDeliversToText.visibility = View.VISIBLE
+        }else{
+            holder.binding.orderDeliversToText.visibility = View.GONE
+
+        }
+
         holder.binding.PlaceName.text = address.saveAddressAs
         holder.binding.location.text = "${address.houseAddress}, ${address.selectedLocation}"
         
@@ -34,6 +45,10 @@ class ShowAllSavedAddressAdapter(private val addressMenuClickListener: AddressMe
         if (!address.receiverNumber.isNullOrEmpty()){
             holder.binding.receiverNumber.visibility = View.VISIBLE
             holder.binding.receiverNumber.text = "Phone number: ${address.receiverNumber}"
+        }
+
+        holder.itemView.setOnClickListener {
+            addressMenuClickListener.addressClick(address)
         }
 
         holder.binding.menuIcon.setOnClickListener {
@@ -84,6 +99,5 @@ class ShowAllSavedAddressAdapter(private val addressMenuClickListener: AddressMe
 
     fun updateAddresses(newAddresses: List<UserSavedAddress>) {
         addressList = newAddresses
-        notifyDataSetChanged()
     }
 }

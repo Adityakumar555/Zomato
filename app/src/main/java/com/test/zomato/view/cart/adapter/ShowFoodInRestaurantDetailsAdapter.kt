@@ -11,11 +11,16 @@ import com.test.zomato.view.cart.interfaces.AddFoodClickListener
 import com.test.zomato.view.main.home.models.FoodItem
 
 class ShowFoodInRestaurantDetailsAdapter(
-    private val foodItems: List<FoodItem>,
+    private var foodItems: List<FoodItem>,
     private val addFoodClickListener: AddFoodClickListener
 ) : RecyclerView.Adapter<ShowFoodInRestaurantDetailsAdapter.ViewHolder>() {
 
     class ViewHolder(val binding: OneFoodItemCardBinding) : RecyclerView.ViewHolder(binding.root)
+
+
+    fun updateList(newFoodList: List<FoodItem>) {
+        foodItems = newFoodList
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val binding = OneFoodItemCardBinding.inflate(LayoutInflater.from(parent.context), parent, false)

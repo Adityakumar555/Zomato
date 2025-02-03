@@ -47,8 +47,8 @@ class CartAndOrderRepository(private val cartDao: CartDao) {
     }
 
     // Fetch all orders in the system
-    suspend fun getAllOrders(): List<OrderDetails> {
-        return cartDao.getAllOrders()
+    suspend fun getAllOrders(numberIs: String): List<OrderDetails> {
+        return cartDao.getAllOrders(numberIs)
     }
 
     // Fetch food items for a specific order by orderId

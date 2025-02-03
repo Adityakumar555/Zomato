@@ -1,5 +1,6 @@
 package com.test.zomato.view.location
 
+import android.app.AlertDialog
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
@@ -52,13 +53,14 @@ class MyAddressesBookActivity : AppCompatActivity(), AddressMenuClickListener {
             startActivity(intent)
         }
 
+        addressAdapter = ShowAllSavedAddressAdapter(this, "addressbookActivity")
+        binding.recyclerView.layoutManager = LinearLayoutManager(this)
+        binding.recyclerView.adapter = addressAdapter
+
         showAllSavedAddresses()
     }
 
     private fun showAllSavedAddresses() {
-        addressAdapter = ShowAllSavedAddressAdapter(this)
-        binding.recyclerView.layoutManager = LinearLayoutManager(this)
-        binding.recyclerView.adapter = addressAdapter
 
         mainViewModel.getAllAddresses(myHelper.numberIs())
         mainViewModel.addresses.observe(this) { addresses ->
@@ -97,9 +99,28 @@ class MyAddressesBookActivity : AppCompatActivity(), AddressMenuClickListener {
                 startActivity(intent)
             }
             "delete" -> {
-                mainViewModel.deleteAddress(address)
-                showAllSavedAddresses()
+                showDeleteConfirmationDialog(address)
             }
         }
+    }
+
+    private fun showDeleteConfirmationDialog(address: UserSavedAddress) {
+        val builder = AlertDialog.Builder(this)
+        builder.setMessage("Are you sure you want to delete this address?")
+
+        builder.setPositiveButton("Yes") { dialog, _ ->
+            mainViewModel.deleteAddress(address.id)
+            showAllSavedAddresses()
+            dialog.dismiss()
+        }
+
+        builder.setNegativeButton("No") { dialog, _ ->
+            dialog.dismiss()
+        }
+
+        builder.create().show()
+    }
+
+    override fun addressClick(userSavedAddress: UserSavedAddress) {
     }
 }

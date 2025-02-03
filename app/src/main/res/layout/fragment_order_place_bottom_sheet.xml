@@ -7,7 +7,7 @@
     app:cardCornerRadius="14dp"
     android:layout_marginBottom="-18dp"
     android:background="@color/white"
-    tools:context=".view.main.home.bottomSheets.OrderPlaceOrNotBottomSheetFragment">
+    tools:context=".view.cart.bottomsheets.OrderPlaceOrNotBottomSheetFragment">
 
 
     <RelativeLayout

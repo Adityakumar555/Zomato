@@ -13,20 +13,27 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.test.zomato.R
-import com.test.zomato.databinding.ActivityShowOrderFoodDetailsBinding
 import com.test.zomato.cartDB.CartAndOrderViewModel
+import com.test.zomato.databinding.ActivityShowOrderFoodDetailsBinding
+import com.test.zomato.utils.AppSharedPreferences
 import com.test.zomato.utils.MyHelper
-import com.test.zomato.view.main.MainActivity
 import com.test.zomato.view.cart.adapter.FoodItemInCartAdapter
-import com.test.zomato.view.main.home.bottomSheets.OrderPlaceOrNotBottomSheetFragment
-import com.test.zomato.view.main.home.bottomSheets.SelectAddressToDeliverFoodBottomSheetFragment
+import com.test.zomato.view.cart.bottomsheets.OrderPlaceOrNotBottomSheetFragment
+import com.test.zomato.view.cart.bottomsheets.SelectAddressToDeliverFoodBottomSheetFragment
 import com.test.zomato.view.cart.interfaces.AddFoodClickListener
-import com.test.zomato.view.orders.interfaces.OrderPlcaeClickListener
+import com.test.zomato.view.location.AddLocationFromMapActivity
+import com.test.zomato.view.location.models.UserSavedAddress
+import com.test.zomato.view.login.UserSignUpActivity
+import com.test.zomato.view.login.cartSkipUserLogin.MobileNumberLoginWithSkipActivity
+import com.test.zomato.view.login.repository.UserViewModel
+import com.test.zomato.view.main.MainActivity
 import com.test.zomato.view.main.home.interfaces.SelectAddressClickListener
 import com.test.zomato.view.main.home.models.FoodItem
+import com.test.zomato.view.main.home.models.RestaurantDetails
+import com.test.zomato.view.orders.interfaces.OrderPlcaeClickListener
 import com.test.zomato.view.orders.orderModels.FoodItemInOrder
 import com.test.zomato.view.orders.orderModels.OrderDetails
-import com.test.zomato.view.main.home.models.RestaurantDetails
+import com.test.zomato.viewModels.MainViewModel
 
 class ShowCartFoodDetailsActivity : AppCompatActivity(), AddFoodClickListener,
     SelectAddressClickListener, OrderPlcaeClickListener {
@@ -36,6 +43,12 @@ class ShowCartFoodDetailsActivity : AppCompatActivity(), AddFoodClickListener,
     private lateinit var roomDbViewModel: CartAndOrderViewModel
     private val myHelper by lazy { MyHelper(this) }
     private var isCouponApplied = false
+    private lateinit var userViewModel: UserViewModel
+    private lateinit var mainViewModel: MainViewModel
+    private var userSavedAddress:UserSavedAddress?= null
+
+    private var selectedAddress: String? = null
+    private val appSharedPreferences by lazy { AppSharedPreferences(this) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,8 +60,117 @@ class ShowCartFoodDetailsActivity : AppCompatActivity(), AddFoodClickListener,
         Log.d("Adityatag", "onCreate: ShowOrderFoodDetailsActivity")
 
         roomDbViewModel = ViewModelProvider(this)[CartAndOrderViewModel::class.java]
+        userViewModel = ViewModelProvider(this)[UserViewModel::class.java]
+        mainViewModel = ViewModelProvider(this)[MainViewModel::class.java]
 
         window.statusBarColor = Color.WHITE
+        // Get the restaurant details from the Intent
+        restaurantDetails = intent.getParcelableExtra("restaurantDetails")
+
+
+
+        val isSkipBtnClick = appSharedPreferences.getBoolean("skipBtnClick")
+
+        if (isSkipBtnClick) {
+
+            val skipUserNumber = appSharedPreferences.getString("skipUserNumber")
+            val skipUserName = appSharedPreferences.getString("skipUserName")
+
+            if (skipUserNumber.isNullOrEmpty() && skipUserName.isNullOrEmpty()) {
+
+                binding.selectAddressForOrder.text = "Add personal details"
+
+                binding.skipDeliveryAddressLayout.visibility = View.GONE
+                binding.skipUserDetailsLayout.visibility = View.GONE
+
+                binding.selectAddressForOrder.setOnClickListener {
+                    startActivity(Intent(this, MobileNumberLoginWithSkipActivity::class.java))
+                }
+
+            } else {
+
+
+
+                mainViewModel.getAllAddresses(myHelper.numberIs())
+                mainViewModel.addresses.observe(this) { addresses ->
+                    binding.selectAddressForOrder.setOnClickListener {
+                        if (addresses.isNullOrEmpty()) {
+                            // If no addresses are available, start MobileNumberLoginWithSkipActivity
+                            startActivity(
+                                Intent(
+                                    this,
+                                    AddLocationFromMapActivity::class.java
+                                )
+                            )
+                        } else {
+                            // If addresses exist, show the bottom sheet fragment
+                            val selectAddressToDeliverFoodBottomSheetFragment =
+                                SelectAddressToDeliverFoodBottomSheetFragment()
+                            selectAddressToDeliverFoodBottomSheetFragment.show(
+                                supportFragmentManager,
+                                "selectAddressToDeliverFoodBottomSheetFragment"
+                            )
+                        }
+                    }
+                }
+
+
+                binding.skipUserDetailsLayout.visibility = View.VISIBLE
+
+                binding.skipUserDetailsLayout.setOnClickListener {
+                    startActivity(Intent(this, MobileNumberLoginWithSkipActivity::class.java))
+                }
+
+
+                binding.selectAddressForOrder.text = "Add Address at next step"
+
+                binding.skipUserDetails.text = "${skipUserName},${skipUserNumber}"
+
+
+            }
+
+
+            binding.text8.text = "Log in to user coupons"
+            binding.text11.visibility = View.GONE
+            binding.dottedLine2.visibility = View.GONE
+            binding.applyCouponLayout.visibility = View.GONE
+            binding.discountLayout.visibility = View.GONE
+            binding.share.visibility = View.GONE
+            binding.zomatoMoneyBalanceLayout.visibility = View.GONE
+            binding.youSavedText.visibility = View.GONE
+
+            binding.offerAutoapplied.setOnClickListener {
+                startActivity(Intent(this, UserSignUpActivity::class.java))
+            }
+
+        } else {
+
+            binding.youSavedText.visibility = View.VISIBLE
+
+            binding.skipUserDetailsLayout.visibility = View.GONE
+            binding.skipDeliveryAddressLayout.visibility = View.GONE
+
+
+            binding.text8.text =
+                "You saved ₹${restaurantDetails?.recommendedFoodList?.get(0)?.foodOffer} on delivery"
+            binding.selectAddressForOrder.text = "Select Address at next step"
+            binding.text11.visibility = View.VISIBLE
+            binding.applyCouponLayout.visibility = View.VISIBLE
+            binding.discountLayout.visibility = View.VISIBLE
+            binding.share.visibility = View.VISIBLE
+            binding.zomatoMoneyBalanceLayout.visibility = View.VISIBLE
+
+            binding.selectAddressForOrder.setOnClickListener {
+                val selectAddressToDeliverFoodBottomSheetFragment =
+                    SelectAddressToDeliverFoodBottomSheetFragment()
+                selectAddressToDeliverFoodBottomSheetFragment.show(
+                    supportFragmentManager,
+                    "selectAddressToDeliverFoodBottomSheetFragment"
+                )
+            }
+
+        }
+
 
 
         Glide.with(this)
@@ -57,6 +179,10 @@ class ShowCartFoodDetailsActivity : AppCompatActivity(), AddFoodClickListener,
 
 
         binding.backButton.setOnClickListener {
+            finish()
+        }
+
+        binding.addItems.setOnClickListener {
             finish()
         }
 
@@ -82,19 +208,17 @@ class ShowCartFoodDetailsActivity : AppCompatActivity(), AddFoodClickListener,
         }
 
 
-        // Get the restaurant details from the Intent
-        restaurantDetails = intent.getParcelableExtra("restaurantDetails")
-
         // Set restaurant details
         restaurantDetails?.apply {
-            binding.restaurantName.text = restaurantName
+
             binding.discountText.text =
                 "You saved ₹${recommendedFoodList[0].foodOffer} on this order"
 
-            binding.text8.text = "You saved ₹${recommendedFoodList[0].foodOffer} on delivery"
+            binding.restaurantName.text = restaurantName
+            binding.restaurantNameSelectedAddress.text = restaurantName
 
             binding.text11.text = "Auto-applied as your order is above ₹199"
-            binding.deliveryTime.text = "Delivery in $timeToReach mins"
+            binding.deliveryTime.text = "Delivery in $timeToReach"
             binding.deliveryLocation.visibility = View.GONE
             binding.bottomLayout2.visibility = View.GONE
             binding.userDetailsCard.visibility = View.GONE
@@ -105,7 +229,10 @@ class ShowCartFoodDetailsActivity : AppCompatActivity(), AddFoodClickListener,
 
         fetchAllFoodAndUpdateAdapter()
 
-        binding.selectAddressForOrder.setOnClickListener {
+
+
+
+        binding.afterSelectedAddressToolbar.setOnClickListener {
             val selectAddressToDeliverFoodBottomSheetFragment =
                 SelectAddressToDeliverFoodBottomSheetFragment()
             selectAddressToDeliverFoodBottomSheetFragment.show(
@@ -114,12 +241,52 @@ class ShowCartFoodDetailsActivity : AppCompatActivity(), AddFoodClickListener,
             )
         }
 
+        binding.deliveryLocation.setOnClickListener {
+            val selectAddressToDeliverFoodBottomSheetFragment =
+                SelectAddressToDeliverFoodBottomSheetFragment()
+            selectAddressToDeliverFoodBottomSheetFragment.show(
+                supportFragmentManager,
+                "selectAddressToDeliverFoodBottomSheetFragment"
+            )
+        }
+
+        fetchUserData(myHelper.numberIs())
+
+    }
+
+    private fun fetchUserData(userPhoneNumber: String) {
+        if (userPhoneNumber.isNotEmpty()) {
+            userViewModel.getUserByPhoneNumber(userPhoneNumber)
+
+            userViewModel.userLiveData.observe(this) { user ->
+                user?.let {
+                    Log.d("userDataProfile", "fetchUserData: $user")
+
+                    if (user.username.isNullOrEmpty() && user.userNumber.isNullOrEmpty()) {
+                        binding.userDetailsCard.visibility = View.GONE
+                    } else {
+                        if (user.username.isNullOrEmpty()) {
+                            binding.userNumber.text = user.userNumber
+                        } else {
+                            binding.userName.text = "${user.username}, "
+                            binding.userNumber.text = user.userNumber
+                        }
+
+                        binding.userDetailsCard.visibility = View.VISIBLE
+                    }
+
+
+                }
+            }
+        }
+
     }
 
 
     private fun updateTotalPriceWithCoupon(applyCoupon: Boolean) {
-        val foodItems = roomDbViewModel.fetchFoodItemsInCart.value?.filter { it.restaurantId == restaurantDetails?.id }
-            ?: emptyList()
+        val foodItems =
+            roomDbViewModel.fetchFoodItemsInCart.value?.filter { it.restaurantId == restaurantDetails?.id }
+                ?: emptyList()
 
         val totalPrice = foodItems.sumOf { it.foodPrice.toDouble() * it.foodQuantity }
         val totalSaved = foodItems.sumOf { it.foodOffer.toDouble() }
@@ -137,7 +304,6 @@ class ShowCartFoodDetailsActivity : AppCompatActivity(), AddFoodClickListener,
         binding.totalBill.text = "Total bill ₹${finalPrice.toInt()} - ₹${remainingPrice.toInt()}"
         binding.youSavedText.text = "You saved ₹${totalSaved}"
     }
-
 
 
     private fun fetchAllFoodAndUpdateAdapter() {
@@ -178,7 +344,6 @@ class ShowCartFoodDetailsActivity : AppCompatActivity(), AddFoodClickListener,
         })
     }
 
-    // Method to update total price
     private fun updateTotalPrice(foodItems: List<FoodItem>) {
         val totalPrice = foodItems.sumOf { it.foodPrice.toDouble() * it.foodQuantity }
         val totalSaved = foodItems.sumOf { it.foodOffer.toDouble() }
@@ -192,7 +357,6 @@ class ShowCartFoodDetailsActivity : AppCompatActivity(), AddFoodClickListener,
     }
 
     override fun onFoodClick(foodItem: FoodItem) {
-        // Handle food item click (if needed)
     }
 
     override fun onFoodQuantityChange(foodItem: FoodItem) {
@@ -210,54 +374,116 @@ class ShowCartFoodDetailsActivity : AppCompatActivity(), AddFoodClickListener,
     }
 
 
-    override fun addressSelectedNowPlaceTheOrder() {
+    override fun addressSelectedNowPlaceTheOrder(userSavedAddress: UserSavedAddress) {
 
-        val address =
+        this.userSavedAddress = userSavedAddress
+
+        val isSkipBtnClick = appSharedPreferences.getBoolean("skipBtnClick")
+
+        if (isSkipBtnClick) {
+
+            binding.share.visibility = View.VISIBLE
+            binding.skipDeliveryAddressLayout.visibility = View.VISIBLE
+            binding.afterSelectedAddressToolbar.visibility = View.VISIBLE
+            binding.showAddress.visibility = View.VISIBLE
+            binding.restaurantName.visibility = View.GONE
+
+            selectedAddress =
+                "${userSavedAddress.houseAddress},${userSavedAddress.selectedLocation},${userSavedAddress.nearbyLandmark}"
+
+            binding.skipDeliveryType.text = "Delivery at ${userSavedAddress.saveAddressAs}"
+            binding.addressType.text = "Delivery at ${userSavedAddress.saveAddressAs}"
+
+            binding.skipAddress.text = selectedAddress
+            binding.userSelectedLocation.text = selectedAddress
+
+            binding.selectAddressForOrder.text = "Place Order"
+
+
+            binding.selectAddressForOrder.setOnClickListener {
+                // Fetch food items from the cart that have quantity > 0
+                confermOrderPlace()
+
+            }
+
+            binding.skipDeliveryAddressLayout.setOnClickListener {
+                val selectAddressToDeliverFoodBottomSheetFragment =
+                    SelectAddressToDeliverFoodBottomSheetFragment()
+                selectAddressToDeliverFoodBottomSheetFragment.show(
+                    supportFragmentManager,
+                    "selectAddressToDeliverFoodBottomSheetFragment"
+                )
+            }
+
+
+        }else {
+
+
+            binding.afterSelectedAddressToolbar.visibility = View.VISIBLE
+            binding.showAddress.visibility = View.VISIBLE
+            binding.restaurantName.visibility = View.GONE
+
+            binding.deliveryLocation.visibility = View.VISIBLE
+            // binding.userDetailsCard.visibility = View.VISIBLE
+            binding.bottomLayout2.visibility = View.VISIBLE
+            binding.selectAddressForOrder.visibility = View.GONE
+
+            /*val address =
             myHelper.extractAddressDetails(myHelper.getLatitude(), myHelper.getLongitude())
-        binding.location.text = address?.fullAddress
+        */
 
-        binding.deliveryLocation.visibility = View.VISIBLE
+            selectedAddress =
+                "${userSavedAddress.houseAddress},${userSavedAddress.selectedLocation},${userSavedAddress.nearbyLandmark}"
+
+            binding.location.text = selectedAddress
+            binding.userSelectedLocation.text = selectedAddress
+
+            binding.addressType.text = "Delivery at ${userSavedAddress.saveAddressAs}"
+
+            binding.restaurantNameSelectedAddress.text = restaurantDetails?.restaurantName
 
 
-        binding.userDetailsCard.visibility = View.VISIBLE
-        binding.bottomLayout2.visibility = View.VISIBLE
-        binding.selectAddressForOrder.visibility = View.GONE
-
-        binding.placeOrder.setOnClickListener {
-            // Fetch food items from the cart that have quantity > 0
-            if (address == null) {
-                Toast.makeText(this, "Address not available", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
+            binding.placeOrder.setOnClickListener {
+                confermOrderPlace()
             }
+        }
+    }
 
-            // Fetch food items from the cart that have quantity > 0
-            val currentRestaurantFoodItems =
-                roomDbViewModel.fetchFoodItemsInCart.value?.filter { it.restaurantId == restaurantDetails?.id }
-                    ?: emptyList()
+    private fun confermOrderPlace() {
 
-            val foodItems = currentRestaurantFoodItems.filter { it.foodQuantity > 0 }
-            if (foodItems.isEmpty()) {
-                Toast.makeText(this, "Your cart is empty!", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
+        if (selectedAddress == null) {
+            Toast.makeText(this, "Address not available", Toast.LENGTH_SHORT).show()
+        }
 
-            var totalPrice = foodItems.sumOf { it.foodPrice.toDouble() * it.foodQuantity }
+        // Fetch food items from the cart that have quantity > 0
+        val currentRestaurantFoodItems =
+            roomDbViewModel.fetchFoodItemsInCart.value?.filter { it.restaurantId == restaurantDetails?.id }
+                ?: emptyList()
 
-            if (isCouponApplied) {
-                totalPrice -= 62.0
-            }
-            val orderPlaceOrNotBottomSheetFragment = OrderPlaceOrNotBottomSheetFragment().apply {
+        val foodItems = currentRestaurantFoodItems.filter { it.foodQuantity > 0 }
+        if (foodItems.isEmpty()) {
+            Toast.makeText(this, "Your cart is empty!", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        var totalPrice = foodItems.sumOf { it.foodPrice.toDouble() * it.foodQuantity }
+
+        if (isCouponApplied) {
+            totalPrice -= 62.0
+        }
+
+        val orderPlaceOrNotBottomSheetFragment =
+            OrderPlaceOrNotBottomSheetFragment().apply {
                 arguments = Bundle().apply {
-                    putString("location", address.fullAddress)
+                    putString("location", selectedAddress)
                     putDouble("totalPrice", totalPrice)
                 }
             }
-            orderPlaceOrNotBottomSheetFragment.show(
-                supportFragmentManager,
-                "orderPlaceBottomSheetFragment"
-            )
 
-        }
+        orderPlaceOrNotBottomSheetFragment.show(
+            supportFragmentManager,
+            "orderPlaceBottomSheetFragment"
+        )
     }
 
 
@@ -277,9 +503,11 @@ class ShowCartFoodDetailsActivity : AppCompatActivity(), AddFoodClickListener,
     }
 
     private fun placeOrder() {
+
         val address =
             myHelper.extractAddressDetails(myHelper.getLatitude(), myHelper.getLongitude())
-        binding.location.text = address?.fullAddress
+
+        binding.location.text = selectedAddress
 
         val currentRestaurantFoodItems =
             roomDbViewModel.fetchFoodItemsInCart.value?.filter { it.restaurantId == restaurantDetails?.id }
@@ -298,14 +526,29 @@ class ShowCartFoodDetailsActivity : AppCompatActivity(), AddFoodClickListener,
             totalPrice -= 62.0
         }
 
+        val userNumber = if (appSharedPreferences.getBoolean("skipBtnClick")) {
+            appSharedPreferences.getString("skipUserNumber", "") ?: myHelper.numberIs()
+        } else {
+            myHelper.numberIs()
+        }
+
+        val userName = if (appSharedPreferences.getBoolean("skipBtnClick")) {
+            appSharedPreferences.getString("skipUserName", "") ?: userSavedAddress?.receiverName
+        } else {
+            userSavedAddress?.receiverName
+        }
+
         val orderDetails = OrderDetails(
             restaurantId = restaurantDetails?.id ?: 0,
             restaurantName = restaurantDetails?.restaurantName ?: "Unknown",
             totalPrice = totalPrice,
             totalSaved = totalSaved,
-            deliveryAddress = address?.fullAddress ?: "Unknown",
+            deliveryAddress = (selectedAddress ?: address?.fullAddress).toString(),
             orderStatus = "Pending",
-            timestamp = System.currentTimeMillis()
+            timestamp = System.currentTimeMillis(),
+            currentUserNumber = userNumber,
+            receiverNumber = userNumber,
+            receiverName = userName?:""
         )
 
         val foodItemsInOrder = foodItems.map { foodItem ->
@@ -327,6 +570,11 @@ class ShowCartFoodDetailsActivity : AppCompatActivity(), AddFoodClickListener,
 
         roomDbViewModel.deleteFoodItemsByRestaurantId(orderDetails.restaurantId)
 
+    }
+
+    override fun onRestart() {
+        super.onRestart()
+        recreate()
     }
 
 

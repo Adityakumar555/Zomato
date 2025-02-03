@@ -160,8 +160,8 @@ class UserSignUpActivity : AppCompatActivity() {
             val credential: Credential? = data?.getParcelableExtra(Credential.EXTRA_KEY)
 
             // set the received data t the text view
-            credential?.apply {
-                binding.userNumber.setText(myHelper.deleteCountry(credential.id))
+            credential?.let {
+                binding.userNumber.setText(myHelper.deleteCountry(it.id))
 
             }
         } else if (requestCode == CREDENTIAL_PICKER_REQUEST && resultCode == CredentialsApi.ACTIVITY_RESULT_NO_HINTS_AVAILABLE) {

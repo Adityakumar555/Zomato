@@ -16,6 +16,9 @@ data class OrderDetails(
     val totalSaved: Double,
     val deliveryAddress: String,
     val orderStatus: String,
-    val timestamp: Long
+    val timestamp: Long,
+    val currentUserNumber:String,
+    val receiverNumber:String,
+    val receiverName:String
 ) : Parcelable
 

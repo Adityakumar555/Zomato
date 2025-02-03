@@ -46,7 +46,10 @@ data class FoodItem(
     val restaurantName: String,
 
     val foodOffer: String,
-    val foodSize: String
+    val foodSize: String,
+
+    val eggFood: Boolean,
+    val sweetFood: Boolean
 
 ) : Parcelable
 

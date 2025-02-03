@@ -1,12 +1,16 @@
 package com.test.zomato.view.main.home
 
+import android.app.Activity.RESULT_OK
+import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.speech.RecognizerIntent
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
@@ -16,12 +20,16 @@ import com.test.zomato.utils.AppSharedPreferences
 import com.test.zomato.utils.MyHelper
 import com.test.zomato.view.login.repository.UserViewModel
 import com.test.zomato.view.profile.ProfileActivity
+import java.util.Locale
 
 class LiveFragment : Fragment() {
 
     private lateinit var binding: FragmentLiveBinding
     private val myHelper by lazy { MyHelper(requireActivity()) }
     private lateinit var userViewModel: UserViewModel
+
+
+    private val REQUEST_CODE_SPEECH_INPUT = 10
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -33,6 +41,7 @@ class LiveFragment : Fragment() {
         myHelper.setStatusBarIconColor(requireActivity(),true)
         userViewModel = ViewModelProvider(this)[UserViewModel::class.java]
 
+        fetchUserData(myHelper.numberIs())
 
         val appPreferences = activity?.let { AppSharedPreferences(it) }
         val isSkipBtnClick = appPreferences?.getBoolean("skipBtnClick")
@@ -70,12 +79,43 @@ class LiveFragment : Fragment() {
             activity?.startActivity(intent)
         }
 
-        fetchUserData(myHelper.numberIs())
+
+        binding.micIcon.setOnClickListener {
+            // Create an intent for speech recognition
+            val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
+                putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+                putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault())
+                putExtra(RecognizerIntent.EXTRA_PROMPT, "Speak to text")
+            }
+
+            try {
+                startActivityForResult(intent, REQUEST_CODE_SPEECH_INPUT)
+            } catch (e: ActivityNotFoundException) {
+                Toast.makeText(activity, "Speech recognition is not supported on this device.", Toast.LENGTH_SHORT).show()
+            }
+        }
 
 
         return binding.root
     }
 
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == REQUEST_CODE_SPEECH_INPUT) {
+            if (resultCode == RESULT_OK && data != null) {
+                // Extract the result from the data
+                val result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
+                if (!result.isNullOrEmpty()) {
+                    // Set the recognized speech text to the search EditText
+                    binding.search.setText(result[0])
+                } else {
+                    Toast.makeText(activity, "No speech input recognized", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
 
     override fun onStart() {
         super.onStart()

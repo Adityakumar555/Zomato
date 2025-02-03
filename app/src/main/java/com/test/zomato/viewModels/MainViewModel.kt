@@ -68,6 +68,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         nearbyLandmark: String
     ) {
         viewModelScope.launch {
+
+            // First, set all other addresses to addressSelected = false
+            userSavedAddressRepository.updateAllAddressesToNotSelected(currentUserNumber)
+
             val address = UserSavedAddress(
                 receiverName = receiverName,
                 receiverNumber = receiverNumber,
@@ -81,14 +85,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             userSavedAddressRepository.saveAddress(address)
         }
     }
-
-    fun saveAddressesForUser(addresses: List<UserSavedAddress>) {
-        viewModelScope.launch {
-            userSavedAddressRepository.deleteAddressesWithUserNumber("")
-            userSavedAddressRepository.saveMultipleAddresses(addresses)
-        }
-    }
-
 
 
     fun updateAddress(
@@ -119,9 +115,17 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
 
 
-    fun deleteAddress(address: UserSavedAddress) {
+    fun deleteAddress(addressId: Int) {
         viewModelScope.launch {
-            userSavedAddressRepository.deleteAddress(address)
+            userSavedAddressRepository.deleteAddress(addressId)
+        }
+    }
+
+
+    fun saveAddressesForUser(addresses: List<UserSavedAddress>) {
+        viewModelScope.launch {
+            userSavedAddressRepository.deleteAddressesWithUserNumber("")
+            userSavedAddressRepository.saveMultipleAddresses(addresses)
         }
     }
 

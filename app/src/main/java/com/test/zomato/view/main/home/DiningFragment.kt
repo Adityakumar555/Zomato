@@ -1,14 +1,18 @@
 package com.test.zomato.view.main.home
 
+import android.app.Activity.RESULT_OK
+import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.location.Location
 import android.os.Bundle
+import android.speech.RecognizerIntent
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -20,11 +24,13 @@ import com.test.zomato.databinding.FragmentDiningBinding
 import com.test.zomato.utils.AppSharedPreferences
 import com.test.zomato.utils.MyHelper
 import com.test.zomato.view.location.SelectAddressActivity
+import com.test.zomato.view.location.models.UserSavedAddress
 import com.test.zomato.view.login.repository.UserViewModel
 import com.test.zomato.view.main.home.adapter.BarAdapter
 import com.test.zomato.view.main.home.models.BarData
 import com.test.zomato.view.profile.ProfileActivity
 import com.test.zomato.viewModels.MainViewModel
+import java.util.Locale
 
 class DiningFragment : Fragment() {
 
@@ -35,6 +41,8 @@ class DiningFragment : Fragment() {
     private lateinit var mainViewModel: MainViewModel
     private lateinit var userViewModel: UserViewModel
     private lateinit var fusedLocationClient: FusedLocationProviderClient
+    private lateinit var savedAddresses: List<UserSavedAddress>
+    private val REQUEST_CODE_SPEECH_INPUT = 10
 
 
     override fun onCreateView(
@@ -50,7 +58,18 @@ class DiningFragment : Fragment() {
         mainViewModel = ViewModelProvider(this)[MainViewModel::class.java]
         userViewModel = ViewModelProvider(this)[UserViewModel::class.java]
 
-        fetchUserData(myHelper.numberIs())
+        //fetchUserData(myHelper.numberIs())
+
+        // Observe the LiveData for saved addresses
+        mainViewModel.addresses.observe(viewLifecycleOwner) { addresses ->
+
+            if (addresses.isNotEmpty()) {
+                savedAddresses = addresses
+                updateToolbarLocation()
+            }else{
+                setLocationOnToolbar()
+            }
+        }
 
 
         val appPreferences = activity?.let { AppSharedPreferences(it) }
@@ -193,18 +212,49 @@ class DiningFragment : Fragment() {
             val intent = Intent(context, SelectAddressActivity::class.java)
             activity?.startActivity(intent)
             activity?.overridePendingTransition(R.anim.slide_in_bottom, R.anim.slide_out_top)
-
         }
 
-        setLocationOnToolbar()
+
+        binding.micIcon.setOnClickListener {
+            // Create an intent for speech recognition
+            val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
+                putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+                putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault())
+                putExtra(RecognizerIntent.EXTRA_PROMPT, "Speak to text")
+            }
+
+            try {
+                startActivityForResult(intent, REQUEST_CODE_SPEECH_INPUT)
+            } catch (e: ActivityNotFoundException) {
+                Toast.makeText(activity, "Speech recognition is not supported on this device.", Toast.LENGTH_SHORT).show()
+            }
+        }
 
         return binding.root
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == REQUEST_CODE_SPEECH_INPUT) {
+            if (resultCode == RESULT_OK && data != null) {
+                // Extract the result from the data
+                val result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
+                if (!result.isNullOrEmpty()) {
+                    // Set the recognized speech text to the search EditText
+                    binding.search.setText(result[0])
+                } else {
+                    Toast.makeText(activity, "No speech input recognized", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
     }
 
 
     override fun onStart() {
         super.onStart()
         fetchUserData(myHelper.numberIs())
+        mainViewModel.getAllAddresses(myHelper.numberIs())
     }
 
 
@@ -229,6 +279,21 @@ class DiningFragment : Fragment() {
                 }
             }
         }
+    }
+
+    private fun updateToolbarLocation() {
+        val selectedAddress = getSelectedAddress()
+        if (selectedAddress != null) {
+            val address = selectedAddress.selectedLocation.split(",")
+            binding.userBlockLocation.text = address[0]
+            binding.address.text = "${address[1]}, ${address[2]}"
+        } else {
+            setLocationOnToolbar()
+        }
+    }
+
+    private fun getSelectedAddress(): UserSavedAddress? {
+        return savedAddresses.find { it.addressSelected }
     }
 
     private fun setLocationOnToolbar() {

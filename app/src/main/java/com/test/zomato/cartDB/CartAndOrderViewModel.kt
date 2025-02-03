@@ -25,9 +25,9 @@ class CartAndOrderViewModel(application: Application) : AndroidViewModel(applica
     val fetchOrdersInDb: LiveData<List<OrderWithFoodItems>> = setOrdersInList
 
     // Fetch all orders
-    fun fetchOrdersFromDb() {
+    fun fetchOrdersFromDb(numberIs: String) {
         viewModelScope.launch {
-            val orders = roomDbRepository.getAllOrders() // Fetch all orders
+            val orders = roomDbRepository.getAllOrders(numberIs) // Fetch all orders
             val ordersWithFoodItems = mutableListOf<OrderWithFoodItems>()
 
             // Fetch food items for each order and create a list of OrderWithFoodItems

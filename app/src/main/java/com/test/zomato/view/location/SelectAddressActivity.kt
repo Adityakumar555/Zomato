@@ -1,5 +1,6 @@
 package com.test.zomato.view.location
 
+import android.app.AlertDialog
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
@@ -8,7 +9,6 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.Toast
-import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -91,7 +91,7 @@ class SelectAddressActivity : AppCompatActivity(), AddressMenuClickListener {
             finish()
         }
 
-        userViewModel = ViewModelProvider(this).get(UserViewModel::class.java)
+        userViewModel = ViewModelProvider(this)[UserViewModel::class.java]
 
        // Toast.makeText(this, "${myHelper.numberIs()}", Toast.LENGTH_SHORT).show()
 
@@ -152,6 +152,11 @@ class SelectAddressActivity : AppCompatActivity(), AddressMenuClickListener {
             }
         }
 
+        addressAdapter = ShowAllSavedAddressAdapter(this, "selectedActivity")
+        binding.savedAddressRecyclerView.layoutManager = LinearLayoutManager(this)
+        binding.savedAddressRecyclerView.adapter = addressAdapter
+
+
 
     }
 
@@ -166,10 +171,6 @@ class SelectAddressActivity : AppCompatActivity(), AddressMenuClickListener {
     }
 
     private fun showSavedAddressInRecyclerView() {
-        addressAdapter = ShowAllSavedAddressAdapter(this)
-        binding.savedAddressRecyclerView.layoutManager = LinearLayoutManager(this)
-        binding.savedAddressRecyclerView.adapter = addressAdapter
-
         binding.savedAddressProgressBar.visibility = View.VISIBLE
         binding.savedAddressRecyclerView.visibility = View.GONE
 
@@ -190,7 +191,6 @@ class SelectAddressActivity : AppCompatActivity(), AddressMenuClickListener {
 
         }
     }
-
 
 
 
@@ -261,10 +261,55 @@ class SelectAddressActivity : AppCompatActivity(), AddressMenuClickListener {
             }
 
             "delete" -> {
-                // when user click on delete
-                mainViewModel.deleteAddress(address)
-                mainViewModel.getAllAddresses(myHelper.numberIs())
+                showDeleteConfirmationDialog(address)
             }
         }
+    }
+
+    private fun showDeleteConfirmationDialog(address: UserSavedAddress) {
+        val builder = AlertDialog.Builder(this)
+        builder.setMessage("Are you sure you want to delete this address?")
+
+        builder.setPositiveButton("Yes") { dialog, _ ->
+            mainViewModel.deleteAddress(address.id)
+            showSavedAddressInRecyclerView()
+
+            dialog.dismiss()
+        }
+
+        builder.setNegativeButton("No") { dialog, _ ->
+            dialog.dismiss()
+        }
+
+        builder.create().show()
+    }
+
+
+    override fun addressClick(userSavedAddress: UserSavedAddress) {
+        mainViewModel.getAllAddresses(myHelper.numberIs())
+
+        mainViewModel.addresses.observe(this, Observer { addresses->
+
+          //  val selectedAddress = address.find { it.addressSelected }
+
+            val updatedAddresses = addresses.map { address ->
+                // If this is the previously selected address, set it to false
+                if (address.addressSelected) {
+                    address.copy(addressSelected = false)
+                } else if (address.id == userSavedAddress.id) {
+                    // If this is the clicked address, set it to true
+                    address.copy(addressSelected = true)
+                } else {
+                    // Leave all other addresses unchanged
+                    address
+                }
+            }
+
+            mainViewModel.saveAddressesForUser(updatedAddresses)
+
+            finish()
+
+        })
+
     }
 }

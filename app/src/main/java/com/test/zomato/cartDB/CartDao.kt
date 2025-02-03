@@ -46,8 +46,8 @@ interface CartDao {
     suspend fun deleteFoodItemsByRestaurantId(restaurantId: Int)
 
     // get all order
-    @Query("SELECT * FROM order_details")
-    suspend fun getAllOrders(): List<OrderDetails>
+    @Query("SELECT * FROM order_details where currentUserNumber = :numberIs")
+    suspend fun getAllOrders(numberIs: String): List<OrderDetails>
 
     // get all food that match orderId to show in your order
     @Query("SELECT * FROM food_items_in_cart WHERE orderId = :orderId")
