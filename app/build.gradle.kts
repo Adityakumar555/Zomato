@@ -21,29 +21,6 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        val properties = Properties()
-        val apiKey: String
-
-        val localPropertiesFile = project.rootProject.file("local.properties")
-        if (localPropertiesFile.exists()) {
-            // This loads the properties from the input stream of the file into the Properties object.
-            // This gets an InputStream for reading the local.properties file. It allows the Properties class to load the file's content.
-            properties.load(localPropertiesFile.inputStream())
-            //This retrieves the value of the API_KEY property from the Properties object,
-            apiKey = properties.getProperty("API_KEY")
-        } else {
-            //The code tries to fetch the API_KEY from environment variables
-            apiKey = System.getenv("API_KEY") ?: ""
-        }
-
-        // This is a Gradle function used to define a field in the BuildConfig class.
-        // access build-specific configurations at runtime.
-        buildConfigField(
-            "String",
-            "API_KEY",
-            "\"$apiKey\""
-        )
-
     }
 
     buildTypes {
