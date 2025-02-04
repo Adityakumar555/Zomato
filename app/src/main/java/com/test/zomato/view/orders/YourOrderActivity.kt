@@ -17,6 +17,7 @@ import com.test.zomato.view.orders.adapters.OrderAdapter
 import com.test.zomato.cartDB.CartAndOrderViewModel
 import com.test.zomato.utils.AppSharedPreferences
 import com.test.zomato.utils.MyHelper
+import com.test.zomato.utils.PrefKeys
 import com.test.zomato.view.orders.orderModels.OrderWithFoodItems
 import java.util.Locale
 
@@ -26,7 +27,7 @@ class YourOrderActivity : AppCompatActivity() {
     private lateinit var roomDbViewModel: CartAndOrderViewModel
     private lateinit var orderAdapter: OrderAdapter
     private val myHelper by lazy { MyHelper(this) }
-    private val appSharedPreferences by lazy { AppSharedPreferences(this) }
+    private val appSharedPreferences by lazy { AppSharedPreferences }
 
     // Store the unfiltered orders list
     private var ordersList = listOf<OrderWithFoodItems>()
@@ -70,8 +71,8 @@ class YourOrderActivity : AppCompatActivity() {
         }
 
 
-        val userNumber = if (appSharedPreferences.getBoolean("skipBtnClick")) {
-            appSharedPreferences.getString("skipUserNumber", "") ?: myHelper.numberIs()
+        val userNumber = if (appSharedPreferences.getBoolean(PrefKeys.SKIP_BTN_CLICK)) {
+            appSharedPreferences.getString(PrefKeys.SKIP_USER_NUMBER, "") ?: myHelper.numberIs()
         } else {
             myHelper.numberIs()
         }

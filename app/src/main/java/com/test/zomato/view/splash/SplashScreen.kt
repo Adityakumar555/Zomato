@@ -13,6 +13,7 @@ import com.test.zomato.view.location.SetLocationPermissionActivity
 import com.test.zomato.view.login.UserSignUpActivity
 import com.test.zomato.view.main.MainActivity
 import com.test.zomato.utils.MyHelper
+import com.test.zomato.utils.PrefKeys
 
 class SplashScreen : AppCompatActivity() {
 
@@ -27,10 +28,9 @@ class SplashScreen : AppCompatActivity() {
         myHelper.setStatusBarIconColor(this,true)
 
 
-        val appPreferences = AppSharedPreferences(this)
-        val isSkipBtnClick = appPreferences.getBoolean("skipBtnClick")
-        val hasVisitedMainActivity = appPreferences.getBoolean("VisitedMainActivity", false)
-        val hasVisitedSetLocation = appPreferences.getBoolean("VisitedSetLocation", false)
+        val isSkipBtnClick = AppSharedPreferences.getBoolean(PrefKeys.SKIP_BTN_CLICK)
+        val hasVisitedMainActivity = AppSharedPreferences.getBoolean(PrefKeys.VISITED_MAIN_ACTIVITY, false)
+        val hasVisitedSetLocation = AppSharedPreferences.getBoolean(PrefKeys.VISITED_SET_LOCATION, false)
 
         if (isSkipBtnClick) {
             Handler(Looper.getMainLooper()).postDelayed({

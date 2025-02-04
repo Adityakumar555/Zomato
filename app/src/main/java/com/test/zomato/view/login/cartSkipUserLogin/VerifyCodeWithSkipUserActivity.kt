@@ -9,6 +9,7 @@ import android.text.TextWatcher
 import androidx.appcompat.app.AppCompatActivity
 import com.test.zomato.databinding.ActivityVerifyCodeWithSkipUserBinding
 import com.test.zomato.utils.AppSharedPreferences
+import com.test.zomato.utils.PrefKeys
 
 class VerifyCodeWithSkipUserActivity : AppCompatActivity() {
     private lateinit var binding: ActivityVerifyCodeWithSkipUserBinding
@@ -21,10 +22,10 @@ class VerifyCodeWithSkipUserActivity : AppCompatActivity() {
 
         window.statusBarColor = Color.parseColor("#F3F4FA")
 
-        val mobileNumber = intent?.getStringExtra("skipUserNumber") ?: ""
-        val skipUserName = intent?.getStringExtra("skipUserName") ?: ""
+        val mobileNumber = intent?.getStringExtra(PrefKeys.SKIP_USER_NUMBER) ?: ""
+        val skipUserName = intent?.getStringExtra(PrefKeys.SKIP_USER_NAME) ?: ""
 
-        val appSharedPreferences = AppSharedPreferences(this)
+        val appSharedPreferences = AppSharedPreferences
 
         binding.backButton.setOnClickListener {
             finish()
@@ -43,8 +44,8 @@ class VerifyCodeWithSkipUserActivity : AppCompatActivity() {
             override fun afterTextChanged(p0: Editable?) {
                 val otpText = p0.toString().trim()
                 if (otpText.length == 4 && otpText == "0000") {
-                    appSharedPreferences.saveString("skipUserNumber", mobileNumber)
-                    appSharedPreferences.saveString("skipUserName", skipUserName)
+                    appSharedPreferences.saveString(PrefKeys.SKIP_USER_NUMBER, mobileNumber)
+                    appSharedPreferences.saveString(PrefKeys.SKIP_USER_NAME, skipUserName)
                     finish()
                 }
             }

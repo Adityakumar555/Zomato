@@ -13,6 +13,7 @@ import com.test.zomato.R
 import com.test.zomato.databinding.ActivityMainBinding
 import com.test.zomato.utils.AppSharedPreferences
 import com.test.zomato.utils.MyHelper
+import com.test.zomato.utils.PrefKeys
 import com.test.zomato.view.main.home.DiningFragment
 import com.test.zomato.view.main.home.HomeFragment
 import com.test.zomato.view.main.home.LiveFragment
@@ -28,7 +29,7 @@ class MainActivity : AppCompatActivity(), OrderPlcaeClickListener {
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var mainViewModel: MainViewModel
     private lateinit var binding: ActivityMainBinding
-    private val appSharedPreferences by lazy { AppSharedPreferences(this) }
+    private val appSharedPreferences by lazy { AppSharedPreferences }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,7 +37,7 @@ class MainActivity : AppCompatActivity(), OrderPlcaeClickListener {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        appSharedPreferences.saveBoolean("VisitedMainActivity", true)
+        appSharedPreferences.saveBoolean(PrefKeys.VISITED_MAIN_ACTIVITY, true)
 
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
@@ -124,8 +125,8 @@ class MainActivity : AppCompatActivity(), OrderPlcaeClickListener {
 
     // Function to save location (latitude and longitude) to SharedPreferences
     private fun saveLocationToSharedPreferences(latitude: Double, longitude: Double) {
-        appSharedPreferences.saveFloat("Latitude", latitude.toFloat())
-        appSharedPreferences.saveFloat("Longitude", longitude.toFloat())
+        appSharedPreferences.saveFloat(PrefKeys.LATITUDE, latitude.toFloat())
+        appSharedPreferences.saveFloat(PrefKeys.LONGITUDE, longitude.toFloat())
     }
 
     private fun loadFragment(fragment: Fragment) {

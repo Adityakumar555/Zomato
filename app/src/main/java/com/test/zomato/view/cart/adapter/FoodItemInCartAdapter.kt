@@ -65,6 +65,5 @@ class FoodItemInCartAdapter(
 
     override fun getItemCount(): Int = foodItems.size
 
-    // ViewHolder using ViewBinding
      class FoodItemViewHolder(val binding: BuyFoodItemLayoutBinding) : RecyclerView.ViewHolder(binding.root)
 }

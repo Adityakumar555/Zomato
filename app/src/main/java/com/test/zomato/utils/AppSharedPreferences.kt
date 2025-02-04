@@ -3,10 +3,13 @@ package com.test.zomato.utils
 import android.content.Context
 import android.content.SharedPreferences
 
-class AppSharedPreferences(context: Context) {
+object AppSharedPreferences {
 
-    private val sharedPreferences: SharedPreferences =
-        context.getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
+    private lateinit var sharedPreferences: SharedPreferences
+
+    fun init(context: Context) {
+        sharedPreferences = context.getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
+    }
 
     fun saveString(key: String, value: String) {
         sharedPreferences.edit().putString(key, value).apply()
@@ -14,10 +17,6 @@ class AppSharedPreferences(context: Context) {
 
     fun saveBoolean(key: String, value: Boolean) {
         sharedPreferences.edit().putBoolean(key, value).apply()
-    }
-
-    fun saveInt(key: String, value: Int) {
-        sharedPreferences.edit().putInt(key, value).apply()
     }
 
     fun saveFloat(key: String, value: Float) {
@@ -30,10 +29,6 @@ class AppSharedPreferences(context: Context) {
 
     fun getBoolean(key: String, defaultValue: Boolean = false): Boolean {
         return sharedPreferences.getBoolean(key, defaultValue)
-    }
-
-    fun getInt(key: String, defaultValue: Int = 0): Int {
-        return sharedPreferences.getInt(key, defaultValue)
     }
 
     fun getFloat(key: String, defaultValue: Float = 0f): Float {

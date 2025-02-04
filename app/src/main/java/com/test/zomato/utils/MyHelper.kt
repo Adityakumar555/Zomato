@@ -46,7 +46,7 @@ class MyHelper(private val context: Context) {
 
     private lateinit var resultLauncher: ActivityResultLauncher<IntentSenderRequest>
 
-    val appPreferences = AppSharedPreferences(context)
+    val appPreferences = AppSharedPreferences
 
   //  val sharedPreferences = context.getSharedPreferences("AppPreferences", MODE_PRIVATE)
 
@@ -71,12 +71,12 @@ class MyHelper(private val context: Context) {
 
 
      fun getLatitude(): Double {
-        val latitude = appPreferences.getFloat("Latitude", 0f).toDouble()
+        val latitude = appPreferences.getFloat(PrefKeys.LATITUDE, 0f).toDouble()
         return latitude
     }
 
      fun getLongitude(): Double {
-        val longitude = appPreferences.getFloat("Longitude", 0f).toDouble()
+        val longitude = appPreferences.getFloat(PrefKeys.LONGITUDE, 0f).toDouble()
         return longitude
     }
 
@@ -236,7 +236,7 @@ class MyHelper(private val context: Context) {
     }
 
     fun numberIs():String{
-        val userPhoneNumber = appPreferences.getString("userNumber", "") ?: ""
+        val userPhoneNumber = appPreferences.getString(PrefKeys.USER_NUMBER, "") ?: ""
         return userPhoneNumber
     }
 

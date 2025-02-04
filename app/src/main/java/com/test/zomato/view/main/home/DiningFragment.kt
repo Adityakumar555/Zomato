@@ -23,6 +23,7 @@ import com.test.zomato.R
 import com.test.zomato.databinding.FragmentDiningBinding
 import com.test.zomato.utils.AppSharedPreferences
 import com.test.zomato.utils.MyHelper
+import com.test.zomato.utils.PrefKeys
 import com.test.zomato.view.location.SelectAddressActivity
 import com.test.zomato.view.location.models.UserSavedAddress
 import com.test.zomato.view.login.repository.UserViewModel
@@ -72,10 +73,10 @@ class DiningFragment : Fragment() {
         }
 
 
-        val appPreferences = activity?.let { AppSharedPreferences(it) }
-        val isSkipBtnClick = appPreferences?.getBoolean("skipBtnClick")
+        val appPreferences = AppSharedPreferences
+        val isSkipBtnClick = appPreferences.getBoolean(PrefKeys.SKIP_BTN_CLICK)
 
-        if (isSkipBtnClick == true) {
+        if (isSkipBtnClick) {
             binding.profile.visibility = View.GONE
             binding.menuIcon.visibility = View.VISIBLE
 

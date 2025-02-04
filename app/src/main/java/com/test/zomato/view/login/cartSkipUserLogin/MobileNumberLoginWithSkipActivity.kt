@@ -8,6 +8,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import com.test.zomato.R
 import com.test.zomato.databinding.ActivityMobileNumberLoginWithSkipBinding
+import com.test.zomato.utils.PrefKeys
 
 class MobileNumberLoginWithSkipActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMobileNumberLoginWithSkipBinding
@@ -34,8 +35,8 @@ class MobileNumberLoginWithSkipActivity : AppCompatActivity() {
                 Toast.makeText(this, "Enter Correct Number.", Toast.LENGTH_SHORT).show()
             } else {
                 val intent = Intent(this, VerifyCodeWithSkipUserActivity::class.java)
-                intent.putExtra("skipUserNumber", mobileNumber)
-                intent.putExtra("skipUserName", name)
+                intent.putExtra(PrefKeys.SKIP_USER_NUMBER, mobileNumber)
+                intent.putExtra(PrefKeys.SKIP_USER_NAME, name)
                 startActivity(intent)
                 finish()
             }

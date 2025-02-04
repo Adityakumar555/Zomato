@@ -12,6 +12,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.test.zomato.databinding.FragmentSelectAddressToDeliverFoodBottomSheetBinding
 import com.test.zomato.utils.AppSharedPreferences
 import com.test.zomato.utils.MyHelper
+import com.test.zomato.utils.PrefKeys
 import com.test.zomato.view.cart.ShowCartFoodDetailsActivity
 import com.test.zomato.view.location.AddLocationFromMapActivity
 import com.test.zomato.view.location.adapter.ShowAllSavedAddressAdapter
@@ -55,10 +56,9 @@ class SelectAddressToDeliverFoodBottomSheetFragment : BottomSheetDialogFragment(
             dismiss()
         }*/
 
-        val appSharedPreferences = activity?.let { AppSharedPreferences(it) }
-        val isSkipBtnClick = appSharedPreferences?.getBoolean("skipBtnClick")
+        val isSkipBtnClick = AppSharedPreferences.getBoolean(PrefKeys.SKIP_BTN_CLICK)
 
-        if (isSkipBtnClick == true) {
+        if (isSkipBtnClick) {
             binding.blinketCard.visibility = View.GONE
         }else{
             binding.blinketCard.visibility = View.GONE

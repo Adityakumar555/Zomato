@@ -17,6 +17,7 @@ import com.test.zomato.R
 import com.test.zomato.databinding.FragmentEnterCompleteAddressBottomSheetBinding
 import com.test.zomato.utils.AppSharedPreferences
 import com.test.zomato.utils.MyHelper
+import com.test.zomato.utils.PrefKeys
 import com.test.zomato.view.location.AddLocationFromMapActivity
 import com.test.zomato.view.location.interfaces.SavedAddressClickListener
 import com.test.zomato.view.login.repository.UserViewModel
@@ -67,8 +68,8 @@ class EnterCompleteAddressBottomSheetFragment : BottomSheetDialogFragment() {
         binding.confirmYourAddressLayout.visibility = View.GONE
         binding.bottomBtnCard2.visibility = View.GONE
 
-        val appPreferences = activity?.let { AppSharedPreferences(it) }
-        val isSkipBtnClick = appPreferences?.getBoolean("skipBtnClick")
+        val appPreferences =  AppSharedPreferences
+        val isSkipBtnClick = appPreferences.getBoolean(PrefKeys.SKIP_BTN_CLICK)
 
         // if user click on skip btn
         if (isSkipBtnClick == true) {

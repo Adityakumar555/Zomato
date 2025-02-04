@@ -25,6 +25,7 @@ import com.test.zomato.databinding.FragmentHomeBinding
 import com.test.zomato.utils.AppSharedPreferences
 import com.test.zomato.utils.EnableDeviceLocationBottomSheetFragment
 import com.test.zomato.utils.MyHelper
+import com.test.zomato.utils.PrefKeys
 import com.test.zomato.view.cart.RestaurantDetailsActivity
 import com.test.zomato.view.cart.interfaces.RestaurantsClickListener
 import com.test.zomato.view.location.SelectAddressActivity
@@ -73,8 +74,8 @@ class HomeFragment : Fragment(), RestaurantsClickListener {
 
 
 
-        val appPreferences = activity?.let { AppSharedPreferences(it) }
-        val isSkipBtnClick = appPreferences?.getBoolean("skipBtnClick")
+        val appPreferences =  AppSharedPreferences
+        val isSkipBtnClick = appPreferences.getBoolean(PrefKeys.SKIP_BTN_CLICK)
 
         // when user click on skip btn
         if (isSkipBtnClick == true) {

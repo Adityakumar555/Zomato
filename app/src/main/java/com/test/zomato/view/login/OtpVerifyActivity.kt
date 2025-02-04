@@ -13,6 +13,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.test.zomato.databinding.ActivityOtpVerifyBinding
 import com.test.zomato.utils.AppSharedPreferences
 import com.test.zomato.utils.MyHelper
+import com.test.zomato.utils.PrefKeys
 import com.test.zomato.view.location.SetLocationPermissionActivity
 import com.test.zomato.view.login.repository.UserViewModel
 import com.test.zomato.view.login.userData.User
@@ -52,8 +53,7 @@ class OtpVerifyActivity : AppCompatActivity() {
         }
 
         binding.skip.setOnClickListener {
-            val appPreferences = AppSharedPreferences(this)
-            appPreferences.saveBoolean("skipBtnClick",true)
+            AppSharedPreferences.saveBoolean(PrefKeys.SKIP_BTN_CLICK,true)
 
             val intent = Intent(this, SetLocationPermissionActivity::class.java)
             startActivity(intent)
@@ -72,9 +72,8 @@ class OtpVerifyActivity : AppCompatActivity() {
             if (otp == "000000") {
                 myHelper.hideKeyboard()
 
-                val appPreferences = AppSharedPreferences(this)
                 if (number != null) {
-                    appPreferences.saveString("userNumber", number)
+                    AppSharedPreferences.saveString(PrefKeys.USER_NUMBER, number)
                 }
 
                 // Create a User object for the new user

@@ -17,6 +17,7 @@ import com.test.zomato.cartDB.CartAndOrderViewModel
 import com.test.zomato.databinding.ActivityShowOrderFoodDetailsBinding
 import com.test.zomato.utils.AppSharedPreferences
 import com.test.zomato.utils.MyHelper
+import com.test.zomato.utils.PrefKeys
 import com.test.zomato.view.cart.adapter.FoodItemInCartAdapter
 import com.test.zomato.view.cart.bottomsheets.OrderPlaceOrNotBottomSheetFragment
 import com.test.zomato.view.cart.bottomsheets.SelectAddressToDeliverFoodBottomSheetFragment
@@ -48,7 +49,7 @@ class ShowCartFoodDetailsActivity : AppCompatActivity(), AddFoodClickListener,
     private var userSavedAddress:UserSavedAddress?= null
 
     private var selectedAddress: String? = null
-    private val appSharedPreferences by lazy { AppSharedPreferences(this) }
+    private val appSharedPreferences by lazy { AppSharedPreferences }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -68,12 +69,12 @@ class ShowCartFoodDetailsActivity : AppCompatActivity(), AddFoodClickListener,
         restaurantDetails = intent.getParcelableExtra("restaurantDetails")
 
 
-        val isSkipBtnClick = appSharedPreferences.getBoolean("skipBtnClick")
+        val isSkipBtnClick = appSharedPreferences.getBoolean(PrefKeys.SKIP_BTN_CLICK)
 
         if (isSkipBtnClick) {
 
-            val skipUserNumber = appSharedPreferences.getString("skipUserNumber")
-            val skipUserName = appSharedPreferences.getString("skipUserName")
+            val skipUserNumber = appSharedPreferences.getString(PrefKeys.SKIP_USER_NUMBER)
+            val skipUserName = appSharedPreferences.getString(PrefKeys.SKIP_USER_NAME)
 
             if (skipUserNumber.isNullOrEmpty() && skipUserName.isNullOrEmpty()) {
 
@@ -372,7 +373,7 @@ class ShowCartFoodDetailsActivity : AppCompatActivity(), AddFoodClickListener,
 
         this.userSavedAddress = userSavedAddress
 
-        val isSkipBtnClick = appSharedPreferences.getBoolean("skipBtnClick")
+        val isSkipBtnClick = appSharedPreferences.getBoolean(PrefKeys.SKIP_BTN_CLICK)
 
         if (isSkipBtnClick) {
 
@@ -520,14 +521,14 @@ class ShowCartFoodDetailsActivity : AppCompatActivity(), AddFoodClickListener,
             totalPrice -= 62.0
         }
 
-        val userNumber = if (appSharedPreferences.getBoolean("skipBtnClick")) {
-            appSharedPreferences.getString("skipUserNumber", "") ?: myHelper.numberIs()
+        val userNumber = if (appSharedPreferences.getBoolean(PrefKeys.SKIP_BTN_CLICK)) {
+            appSharedPreferences.getString(PrefKeys.SKIP_USER_NUMBER, "") ?: myHelper.numberIs()
         } else {
             myHelper.numberIs()
         }
 
-        val userName = if (appSharedPreferences.getBoolean("skipBtnClick")) {
-            appSharedPreferences.getString("skipUserName", "") ?: userSavedAddress?.receiverName
+        val userName = if (appSharedPreferences.getBoolean(PrefKeys.SKIP_BTN_CLICK)) {
+            appSharedPreferences.getString(PrefKeys.SKIP_USER_NAME, "") ?: userSavedAddress?.receiverName
         } else {
             userSavedAddress?.receiverName
         }

@@ -21,6 +21,7 @@ import com.test.zomato.databinding.ActivityUserSignUpBinding
 import com.test.zomato.utils.AppSharedPreferences
 import com.test.zomato.utils.CustomProgressDialog
 import com.test.zomato.utils.MyHelper
+import com.test.zomato.utils.PrefKeys
 import com.test.zomato.utils.RequestPermissionDialog
 import com.test.zomato.view.location.SetLocationPermissionActivity
 
@@ -67,8 +68,8 @@ class UserSignUpActivity : AppCompatActivity() {
         }
 
         binding.skip.setOnClickListener {
-            val appPreferences = AppSharedPreferences(this)
-            appPreferences.saveBoolean("skipBtnClick",true)
+            val appPreferences = AppSharedPreferences
+            appPreferences.saveBoolean(PrefKeys.SKIP_BTN_CLICK,true)
 
             val intent = Intent(this, SetLocationPermissionActivity::class.java)
             startActivity(intent)
@@ -87,8 +88,8 @@ class UserSignUpActivity : AppCompatActivity() {
                     Toast.LENGTH_SHORT
                 ).show()
             } else {
-                val appPreferences = AppSharedPreferences(this)
-                appPreferences.saveBoolean("skipBtnClick",false)
+                // save skip status
+                AppSharedPreferences.saveBoolean(PrefKeys.SKIP_BTN_CLICK,false)
 
                 showProgressBar()
                 Handler(Looper.getMainLooper()).postDelayed({

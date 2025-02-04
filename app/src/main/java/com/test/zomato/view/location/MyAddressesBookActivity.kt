@@ -12,6 +12,7 @@ import com.test.zomato.R
 import com.test.zomato.databinding.ActivityMyAddressesBinding
 import com.test.zomato.utils.AppSharedPreferences
 import com.test.zomato.utils.MyHelper
+import com.test.zomato.utils.PrefKeys
 import com.test.zomato.view.location.adapter.ShowAllSavedAddressAdapter
 import com.test.zomato.view.location.interfaces.AddressMenuClickListener
 import com.test.zomato.view.location.models.UserSavedAddress
@@ -38,8 +39,7 @@ class MyAddressesBookActivity : AppCompatActivity(), AddressMenuClickListener {
             finish()
         }
 
-        val appPreferences =  AppSharedPreferences(this)
-        val isSkipBtnClick = appPreferences.getBoolean("skipBtnClick")
+        val isSkipBtnClick = AppSharedPreferences.getBoolean(PrefKeys.SKIP_BTN_CLICK)
 
         // when user click on skip btn
         if (isSkipBtnClick) {

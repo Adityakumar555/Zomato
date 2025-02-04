@@ -18,6 +18,7 @@ import com.test.zomato.R
 import com.test.zomato.databinding.FragmentLiveBinding
 import com.test.zomato.utils.AppSharedPreferences
 import com.test.zomato.utils.MyHelper
+import com.test.zomato.utils.PrefKeys
 import com.test.zomato.view.login.repository.UserViewModel
 import com.test.zomato.view.profile.ProfileActivity
 import java.util.Locale
@@ -42,10 +43,10 @@ class LiveFragment : Fragment() {
 
         fetchUserData(myHelper.numberIs())
 
-        val appPreferences = activity?.let { AppSharedPreferences(it) }
-        val isSkipBtnClick = appPreferences?.getBoolean("skipBtnClick")
+        val appPreferences =  AppSharedPreferences
+        val isSkipBtnClick = appPreferences.getBoolean(PrefKeys.SKIP_BTN_CLICK)
 
-        if (isSkipBtnClick == true) {
+        if (isSkipBtnClick) {
             binding.profile.visibility = View.GONE
             binding.menuIcon.visibility = View.VISIBLE
 

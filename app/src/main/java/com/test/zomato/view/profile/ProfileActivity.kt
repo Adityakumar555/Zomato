@@ -13,6 +13,7 @@ import com.test.zomato.R
 import com.test.zomato.databinding.ActivityProfileBinding
 import com.test.zomato.utils.AppSharedPreferences
 import com.test.zomato.utils.MyHelper
+import com.test.zomato.utils.PrefKeys
 import com.test.zomato.view.location.MyAddressesBookActivity
 import com.test.zomato.view.login.UserSignUpActivity
 import com.test.zomato.view.login.repository.UserViewModel
@@ -43,8 +44,8 @@ class ProfileActivity : AppCompatActivity() {
 
         fetchUserData(myHelper.numberIs())
 
-        val appPreferences = AppSharedPreferences(this)
-        val isSkipBtnClick = appPreferences.getBoolean("skipBtnClick")
+        val appPreferences = AppSharedPreferences
+        val isSkipBtnClick = appPreferences.getBoolean(PrefKeys.SKIP_BTN_CLICK)
 
         if (isSkipBtnClick) {
 
@@ -98,7 +99,7 @@ class ProfileActivity : AppCompatActivity() {
 
             Toast.makeText(this, "Logout clicked", Toast.LENGTH_SHORT).show()
 
-            val appSharedPreferences = AppSharedPreferences(this)
+            val appSharedPreferences = AppSharedPreferences
             appSharedPreferences.clearAllData()
 
             val intent = Intent(this, UserSignUpActivity::class.java)

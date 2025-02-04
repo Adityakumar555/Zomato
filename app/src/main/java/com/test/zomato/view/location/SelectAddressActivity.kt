@@ -23,6 +23,7 @@ import com.test.zomato.databinding.ActivitySelectAddressBinding
 import com.test.zomato.utils.AppSharedPreferences
 import com.test.zomato.utils.EnableAppLocationPermissionDialogFragment
 import com.test.zomato.utils.MyHelper
+import com.test.zomato.utils.PrefKeys
 import com.test.zomato.view.location.adapter.ShowAllSavedAddressAdapter
 import com.test.zomato.view.location.adapter.ViewNearbyLocationsAdapter
 import com.test.zomato.view.location.interfaces.AddressMenuClickListener
@@ -73,8 +74,7 @@ class SelectAddressActivity : AppCompatActivity(), AddressMenuClickListener {
 
 
         // initilize the sharedpresrence class to get saved value in sharedprefrence
-        val appPreferences = AppSharedPreferences(this)
-        val isSkipBtnClick = appPreferences.getBoolean("skipBtnClick")
+        val isSkipBtnClick = AppSharedPreferences.getBoolean(PrefKeys.SKIP_BTN_CLICK)
 
         if (isSkipBtnClick) {
             binding.blinketCard.visibility = View.GONE
