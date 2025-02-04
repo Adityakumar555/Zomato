@@ -7,7 +7,7 @@ object AppSharedPreferences {
 
     private lateinit var sharedPreferences: SharedPreferences
 
-    fun init(context: Context) {
+    fun initilize(context: Context) {
         sharedPreferences = context.getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
     }
 
