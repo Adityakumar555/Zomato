@@ -27,7 +27,7 @@ class YourOrderActivity : AppCompatActivity() {
     private lateinit var roomDbViewModel: CartAndOrderViewModel
     private lateinit var orderAdapter: OrderAdapter
     private val myHelper by lazy { MyHelper(this) }
-    private val appSharedPreferences by lazy { AppSharedPreferences }
+    private val appSharedPreferences by lazy { AppSharedPreferences.getInstance(this) }
 
     // Store the unfiltered orders list
     private var ordersList = listOf<OrderWithFoodItems>()
@@ -71,8 +71,8 @@ class YourOrderActivity : AppCompatActivity() {
         }
 
 
-        val userNumber = if (appSharedPreferences.getBoolean(PrefKeys.SKIP_BTN_CLICK)) {
-            appSharedPreferences.getString(PrefKeys.SKIP_USER_NUMBER, "") ?: myHelper.numberIs()
+        val userNumber = if (appSharedPreferences?.getBoolean(PrefKeys.SKIP_BTN_CLICK) == true) {
+            appSharedPreferences?.getString(PrefKeys.SKIP_USER_NUMBER) ?: myHelper.numberIs()
         } else {
             myHelper.numberIs()
         }

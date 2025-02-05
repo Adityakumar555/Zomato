@@ -33,6 +33,8 @@ class UserSignUpActivity : AppCompatActivity() {
     // A launcher object that accepts IntentSenderRequests. It is use to trigger external intents.
     private lateinit var resultLauncher: ActivityResultLauncher<IntentSenderRequest>
 
+    private val appSharedPreferences by lazy { AppSharedPreferences.getInstance(this) }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -68,8 +70,8 @@ class UserSignUpActivity : AppCompatActivity() {
         }
 
         binding.skip.setOnClickListener {
-            val appPreferences = AppSharedPreferences
-            appPreferences.saveBoolean(PrefKeys.SKIP_BTN_CLICK,true)
+           // val appPreferences = AppSharedPreferences
+            appSharedPreferences?.saveBoolean(PrefKeys.SKIP_BTN_CLICK,true)
 
             val intent = Intent(this, SetLocationPermissionActivity::class.java)
             startActivity(intent)
@@ -89,7 +91,7 @@ class UserSignUpActivity : AppCompatActivity() {
                 ).show()
             } else {
                 // save skip status
-                AppSharedPreferences.saveBoolean(PrefKeys.SKIP_BTN_CLICK,false)
+                appSharedPreferences?.saveBoolean(PrefKeys.SKIP_BTN_CLICK,false)
 
                 showProgressBar()
                 Handler(Looper.getMainLooper()).postDelayed({

@@ -24,6 +24,7 @@ class MyAddressesBookActivity : AppCompatActivity(), AddressMenuClickListener {
     private lateinit var mainViewModel: MainViewModel
     private lateinit var addressAdapter: ShowAllSavedAddressAdapter
     private val myHelper by lazy { MyHelper(this) }
+    private val appSharedPreferences by lazy { AppSharedPreferences.getInstance(this) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,10 +40,10 @@ class MyAddressesBookActivity : AppCompatActivity(), AddressMenuClickListener {
             finish()
         }
 
-        val isSkipBtnClick = AppSharedPreferences.getBoolean(PrefKeys.SKIP_BTN_CLICK)
+        val isSkipBtnClick = appSharedPreferences?.getBoolean(PrefKeys.SKIP_BTN_CLICK)
 
         // when user click on skip btn
-        if (isSkipBtnClick) {
+        if (isSkipBtnClick == true) {
             binding.blinketCard.visibility = View.GONE
         }else{
             binding.blinketCard.visibility = View.VISIBLE
@@ -50,6 +51,7 @@ class MyAddressesBookActivity : AppCompatActivity(), AddressMenuClickListener {
 
         binding.addLocationCard.setOnClickListener {
             val intent = Intent(this, AddLocationFromMapActivity::class.java)
+            intent.putExtra("fromMyAddressBook","fromMyAddressBook")
             startActivity(intent)
         }
 
@@ -123,4 +125,10 @@ class MyAddressesBookActivity : AppCompatActivity(), AddressMenuClickListener {
 
     override fun addressClick(userSavedAddress: UserSavedAddress) {
     }
+
+    override fun onRestart() {
+        super.onRestart()
+        showAllSavedAddresses()
+    }
+
 }

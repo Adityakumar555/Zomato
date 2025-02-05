@@ -92,7 +92,6 @@ class AddLocationFromMapActivity : AppCompatActivity(), OnMapReadyCallback,
             } else {
                 myHelper.requestLocationPermission(this)  // Request location permission
             }
-
            // getCurrentLocation()
         }
 
@@ -129,8 +128,6 @@ class AddLocationFromMapActivity : AppCompatActivity(), OnMapReadyCallback,
                 )
             }
         }
-
-
 
         binding.search.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(
@@ -291,9 +288,16 @@ class AddLocationFromMapActivity : AppCompatActivity(), OnMapReadyCallback,
 
 
     override fun addressSave() {
-        val intent = Intent(this, MainActivity::class.java)
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
-        startActivity(intent)
-        finishAffinity()
+
+        if (intent.getStringExtra("fromMyAddressBook") == "fromMyAddressBook"){
+            finish()
+        }else{
+            val intent = Intent(this, MainActivity::class.java)
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
+            startActivity(intent)
+            finishAffinity()
+        }
+
+
     }
 }

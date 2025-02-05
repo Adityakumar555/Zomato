@@ -33,6 +33,7 @@ class EnterCompleteAddressBottomSheetFragment : BottomSheetDialogFragment() {
     private lateinit var userViewModel: UserViewModel
 
     private var eventListener: SavedAddressClickListener? = null
+    private val appSharedPreferences by lazy { activity?.let { AppSharedPreferences.getInstance(it) } }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -68,8 +69,7 @@ class EnterCompleteAddressBottomSheetFragment : BottomSheetDialogFragment() {
         binding.confirmYourAddressLayout.visibility = View.GONE
         binding.bottomBtnCard2.visibility = View.GONE
 
-        val appPreferences =  AppSharedPreferences
-        val isSkipBtnClick = appPreferences.getBoolean(PrefKeys.SKIP_BTN_CLICK)
+        val isSkipBtnClick = appSharedPreferences?.getBoolean(PrefKeys.SKIP_BTN_CLICK)
 
         // if user click on skip btn
         if (isSkipBtnClick == true) {

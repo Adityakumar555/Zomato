@@ -28,7 +28,7 @@ class LiveFragment : Fragment() {
     private lateinit var binding: FragmentLiveBinding
     private val myHelper by lazy { MyHelper(requireActivity()) }
     private lateinit var userViewModel: UserViewModel
-
+    private val appSharedPreferences by lazy { activity?.let { AppSharedPreferences.getInstance(it) } }
 
     private val REQUEST_CODE_SPEECH_INPUT = 10
 
@@ -43,10 +43,9 @@ class LiveFragment : Fragment() {
 
         fetchUserData(myHelper.numberIs())
 
-        val appPreferences =  AppSharedPreferences
-        val isSkipBtnClick = appPreferences.getBoolean(PrefKeys.SKIP_BTN_CLICK)
+        val isSkipBtnClick = appSharedPreferences?.getBoolean(PrefKeys.SKIP_BTN_CLICK)
 
-        if (isSkipBtnClick) {
+        if (isSkipBtnClick == true) {
             binding.profile.visibility = View.GONE
             binding.menuIcon.visibility = View.VISIBLE
 

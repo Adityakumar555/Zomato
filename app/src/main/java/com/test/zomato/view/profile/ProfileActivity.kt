@@ -24,6 +24,7 @@ class ProfileActivity : AppCompatActivity() {
     private lateinit var binding: ActivityProfileBinding
     private lateinit var userViewModel: UserViewModel
     private val myHelper by lazy { MyHelper(this) }
+    private val appSharedPreferences by lazy { AppSharedPreferences.getInstance(this) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,10 +45,9 @@ class ProfileActivity : AppCompatActivity() {
 
         fetchUserData(myHelper.numberIs())
 
-        val appPreferences = AppSharedPreferences
-        val isSkipBtnClick = appPreferences.getBoolean(PrefKeys.SKIP_BTN_CLICK)
+        val isSkipBtnClick = appSharedPreferences?.getBoolean(PrefKeys.SKIP_BTN_CLICK)
 
-        if (isSkipBtnClick) {
+        if (isSkipBtnClick == true) {
 
             binding.profileViews.visibility = View.GONE
             binding.diningAndExperiencesSections.visibility = View.GONE
@@ -98,10 +98,7 @@ class ProfileActivity : AppCompatActivity() {
         binding.logout.setOnClickListener {
 
             Toast.makeText(this, "Logout clicked", Toast.LENGTH_SHORT).show()
-
-            val appSharedPreferences = AppSharedPreferences
-            appSharedPreferences.clearAllData()
-
+            appSharedPreferences?.clearAllData()
             val intent = Intent(this, UserSignUpActivity::class.java)
             startActivity(intent)
             finish()

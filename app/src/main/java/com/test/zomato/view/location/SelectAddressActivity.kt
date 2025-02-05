@@ -45,6 +45,7 @@ class SelectAddressActivity : AppCompatActivity(), AddressMenuClickListener {
     private lateinit var userViewModel: UserViewModel
 
     private lateinit var fusedLocationClient: FusedLocationProviderClient
+    private val appSharedPreferences by lazy { AppSharedPreferences.getInstance(this) }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -74,9 +75,9 @@ class SelectAddressActivity : AppCompatActivity(), AddressMenuClickListener {
 
 
         // initilize the sharedpresrence class to get saved value in sharedprefrence
-        val isSkipBtnClick = AppSharedPreferences.getBoolean(PrefKeys.SKIP_BTN_CLICK)
+        val isSkipBtnClick = appSharedPreferences?.getBoolean(PrefKeys.SKIP_BTN_CLICK)
 
-        if (isSkipBtnClick) {
+        if (isSkipBtnClick == true) {
             binding.blinketCard.visibility = View.GONE
             binding.savedAddressRecyclerViewLayout.visibility = View.GONE
             binding.dividerView4.visibility = View.GONE
@@ -196,6 +197,7 @@ class SelectAddressActivity : AppCompatActivity(), AddressMenuClickListener {
 
         binding.progressBar.visibility = View.VISIBLE
         binding.recyclerView.visibility = View.GONE
+
         mainViewModel.getNearByLocation(myHelper.getLatitude(), myHelper.getLongitude())
 
         mainViewModel.nearLocationList.observe(this, Observer { validPlaces ->

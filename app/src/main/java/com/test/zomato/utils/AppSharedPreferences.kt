@@ -1,15 +1,29 @@
 package com.test.zomato.utils
 
 import android.content.Context
-import android.content.SharedPreferences
 
-object AppSharedPreferences {
+class AppSharedPreferences private constructor(context: Context){
 
-    private lateinit var sharedPreferences: SharedPreferences
 
-    fun initilize(context: Context) {
-        sharedPreferences = context.getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
+    private var sharedPreferences = context.getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
+
+
+    companion object{
+
+        private var INSTANCE: AppSharedPreferences? = null
+
+        fun getInstance(context: Context): AppSharedPreferences? {
+            if (INSTANCE == null) {
+                synchronized(this) {
+                    if (INSTANCE == null)
+                        INSTANCE = AppSharedPreferences(context)
+                }
+            }
+            return INSTANCE
+        }
+
     }
+
 
     fun saveString(key: String, value: String) {
         sharedPreferences.edit().putString(key, value).apply()
@@ -23,16 +37,16 @@ object AppSharedPreferences {
         sharedPreferences.edit().putFloat(key, value).apply()
     }
 
-    fun getString(key: String, defaultValue: String? = null): String? {
-        return sharedPreferences.getString(key, defaultValue)
+    fun getString(key: String): String? {
+        return sharedPreferences.getString(key, null)
     }
 
-    fun getBoolean(key: String, defaultValue: Boolean = false): Boolean {
-        return sharedPreferences.getBoolean(key, defaultValue)
+    fun getBoolean(key: String): Boolean {
+        return sharedPreferences.getBoolean(key, false)
     }
 
-    fun getFloat(key: String, defaultValue: Float = 0f): Float {
-        return sharedPreferences.getFloat(key, defaultValue)
+    fun getFloat(key: String): Float {
+        return sharedPreferences.getFloat(key, 0f)
     }
 
     fun clearAllData() {

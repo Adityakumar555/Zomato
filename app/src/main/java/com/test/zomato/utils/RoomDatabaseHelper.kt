@@ -27,7 +27,7 @@ abstract class RoomDatabaseHelper:RoomDatabase() {
         fun getInstance( context: Context): RoomDatabaseHelper? {
             if (instance == null) {
                 synchronized(RoomDatabaseHelper::class.java) {
-                    instance = Room.databaseBuilder(context.applicationContext, RoomDatabaseHelper::class.java, "Zomatppao")
+                    instance = Room.databaseBuilder(context, RoomDatabaseHelper::class.java, "Zomatppao")
                         .build()
                 }
             }

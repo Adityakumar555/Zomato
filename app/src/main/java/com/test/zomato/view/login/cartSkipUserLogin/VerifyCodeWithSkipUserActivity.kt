@@ -13,6 +13,7 @@ import com.test.zomato.utils.PrefKeys
 
 class VerifyCodeWithSkipUserActivity : AppCompatActivity() {
     private lateinit var binding: ActivityVerifyCodeWithSkipUserBinding
+    private val appSharedPreferences by lazy { AppSharedPreferences.getInstance(this) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,7 +26,6 @@ class VerifyCodeWithSkipUserActivity : AppCompatActivity() {
         val mobileNumber = intent?.getStringExtra(PrefKeys.SKIP_USER_NUMBER) ?: ""
         val skipUserName = intent?.getStringExtra(PrefKeys.SKIP_USER_NAME) ?: ""
 
-        val appSharedPreferences = AppSharedPreferences
 
         binding.backButton.setOnClickListener {
             finish()
@@ -44,8 +44,8 @@ class VerifyCodeWithSkipUserActivity : AppCompatActivity() {
             override fun afterTextChanged(p0: Editable?) {
                 val otpText = p0.toString().trim()
                 if (otpText.length == 4 && otpText == "0000") {
-                    appSharedPreferences.saveString(PrefKeys.SKIP_USER_NUMBER, mobileNumber)
-                    appSharedPreferences.saveString(PrefKeys.SKIP_USER_NAME, skipUserName)
+                    appSharedPreferences?.saveString(PrefKeys.SKIP_USER_NUMBER, mobileNumber)
+                    appSharedPreferences?.saveString(PrefKeys.SKIP_USER_NAME, skipUserName)
                     finish()
                 }
             }

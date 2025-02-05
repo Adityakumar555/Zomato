@@ -24,6 +24,7 @@ class OtpVerifyActivity : AppCompatActivity() {
     private lateinit var binding: ActivityOtpVerifyBinding
     private val myHelper: MyHelper by lazy { MyHelper(this) }
     private lateinit var userViewModel: UserViewModel
+    private val appSharedPreferences by lazy { AppSharedPreferences.getInstance(this) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,7 +54,7 @@ class OtpVerifyActivity : AppCompatActivity() {
         }
 
         binding.skip.setOnClickListener {
-            AppSharedPreferences.saveBoolean(PrefKeys.SKIP_BTN_CLICK,true)
+            appSharedPreferences?.saveBoolean(PrefKeys.SKIP_BTN_CLICK,true)
 
             val intent = Intent(this, SetLocationPermissionActivity::class.java)
             startActivity(intent)
@@ -73,7 +74,7 @@ class OtpVerifyActivity : AppCompatActivity() {
                 myHelper.hideKeyboard()
 
                 if (number != null) {
-                    AppSharedPreferences.saveString(PrefKeys.USER_NUMBER, number)
+                    appSharedPreferences?.saveString(PrefKeys.USER_NUMBER, number)
                 }
 
                 // Create a User object for the new user

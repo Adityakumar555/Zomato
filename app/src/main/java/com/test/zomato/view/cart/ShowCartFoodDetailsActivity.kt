@@ -49,7 +49,7 @@ class ShowCartFoodDetailsActivity : AppCompatActivity(), AddFoodClickListener,
     private var userSavedAddress:UserSavedAddress?= null
 
     private var selectedAddress: String? = null
-    private val appSharedPreferences by lazy { AppSharedPreferences }
+    private val appSharedPreferences by lazy { AppSharedPreferences.getInstance(this) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -69,12 +69,12 @@ class ShowCartFoodDetailsActivity : AppCompatActivity(), AddFoodClickListener,
         restaurantDetails = intent.getParcelableExtra("restaurantDetails")
 
 
-        val isSkipBtnClick = appSharedPreferences.getBoolean(PrefKeys.SKIP_BTN_CLICK)
+        val isSkipBtnClick = appSharedPreferences?.getBoolean(PrefKeys.SKIP_BTN_CLICK)
 
-        if (isSkipBtnClick) {
+        if (isSkipBtnClick == true) {
 
-            val skipUserNumber = appSharedPreferences.getString(PrefKeys.SKIP_USER_NUMBER)
-            val skipUserName = appSharedPreferences.getString(PrefKeys.SKIP_USER_NAME)
+            val skipUserNumber = appSharedPreferences?.getString(PrefKeys.SKIP_USER_NUMBER)
+            val skipUserName = appSharedPreferences?.getString(PrefKeys.SKIP_USER_NAME)
 
             if (skipUserNumber.isNullOrEmpty() && skipUserName.isNullOrEmpty()) {
 
@@ -373,9 +373,9 @@ class ShowCartFoodDetailsActivity : AppCompatActivity(), AddFoodClickListener,
 
         this.userSavedAddress = userSavedAddress
 
-        val isSkipBtnClick = appSharedPreferences.getBoolean(PrefKeys.SKIP_BTN_CLICK)
+        val isSkipBtnClick = appSharedPreferences?.getBoolean(PrefKeys.SKIP_BTN_CLICK)
 
-        if (isSkipBtnClick) {
+        if (isSkipBtnClick == true) {
 
             binding.share.visibility = View.VISIBLE
             binding.skipDeliveryAddressLayout.visibility = View.VISIBLE
@@ -521,14 +521,14 @@ class ShowCartFoodDetailsActivity : AppCompatActivity(), AddFoodClickListener,
             totalPrice -= 62.0
         }
 
-        val userNumber = if (appSharedPreferences.getBoolean(PrefKeys.SKIP_BTN_CLICK)) {
-            appSharedPreferences.getString(PrefKeys.SKIP_USER_NUMBER, "") ?: myHelper.numberIs()
+        val userNumber = if (appSharedPreferences?.getBoolean(PrefKeys.SKIP_BTN_CLICK) == true) {
+            appSharedPreferences?.getString(PrefKeys.SKIP_USER_NUMBER) ?: myHelper.numberIs()
         } else {
             myHelper.numberIs()
         }
 
-        val userName = if (appSharedPreferences.getBoolean(PrefKeys.SKIP_BTN_CLICK)) {
-            appSharedPreferences.getString(PrefKeys.SKIP_USER_NAME, "") ?: userSavedAddress?.receiverName
+        val userName = if (appSharedPreferences?.getBoolean(PrefKeys.SKIP_BTN_CLICK) == true) {
+            appSharedPreferences?.getString(PrefKeys.SKIP_USER_NAME) ?: userSavedAddress?.receiverName
         } else {
             userSavedAddress?.receiverName
         }

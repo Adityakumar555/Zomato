@@ -21,6 +21,7 @@ import com.test.zomato.R
 import com.test.zomato.databinding.ActivityRestaurantDetailsBinding
 import com.test.zomato.cartDB.CartAndOrderViewModel
 import com.test.zomato.view.cart.adapter.ShowFoodInRestaurantDetailsAdapter
+import com.test.zomato.view.cart.enums.FilterType
 import com.test.zomato.view.main.home.bottomSheets.AddFoodInCartBottomSheet
 import com.test.zomato.view.cart.interfaces.AddFoodClickListener
 import com.test.zomato.view.cart.interfaces.OnBottomSheetActionListener
@@ -44,7 +45,7 @@ class RestaurantDetailsActivity : AppCompatActivity(), AddFoodClickListener,
     private lateinit var updatedFoodList: MutableList<FoodItem>
 
     // Store selected filters
-    private val selectedFilters = mutableSetOf<String>()
+    private val selectedFilters = mutableSetOf<FilterType>()
 
     private var isVeg = false
     private var isEgg = false
@@ -123,11 +124,12 @@ class RestaurantDetailsActivity : AppCompatActivity(), AddFoodClickListener,
                 })
 
 
-                binding.vegChips.setOnClickListener { toggleFilter("veg", binding.vegChips) }
-                binding.eggChips.setOnClickListener { toggleFilter("egg", binding.eggChips) }
-                binding.nonVegChips.setOnClickListener { toggleFilter("nonVeg", binding.nonVegChips) }
-                binding.fourPlusRatedFood.setOnClickListener { toggleFilter("rated4Plus", binding.fourPlusRatedFood) }
-                binding.sweets.setOnClickListener { toggleFilter("sweet", binding.sweets) }
+                binding.vegChips.setOnClickListener { toggleFilter(FilterType.VEG, binding.vegChips) }
+                binding.eggChips.setOnClickListener { toggleFilter(FilterType.EGG, binding.eggChips) }
+                binding.nonVegChips.setOnClickListener { toggleFilter(FilterType.NON_VEG, binding.nonVegChips) }
+                binding.fourPlusRatedFood.setOnClickListener { toggleFilter(FilterType.RATED_4_PLUS, binding.fourPlusRatedFood) }
+                binding.sweets.setOnClickListener { toggleFilter(FilterType.SWEET, binding.sweets) }
+
             }
 
             // Setup the expand/collapse functionality for food list
@@ -135,8 +137,7 @@ class RestaurantDetailsActivity : AppCompatActivity(), AddFoodClickListener,
         }
     }
 
-    private fun toggleFilter(filterType: String, filterView: View) {
-        // Toggle the selected filter based on the filter type
+    private fun toggleFilter(filterType: FilterType, filterView: View) {
         if (selectedFilters.contains(filterType)) {
             // Deselect if already selected
             selectedFilters.remove(filterType)
@@ -147,64 +148,46 @@ class RestaurantDetailsActivity : AppCompatActivity(), AddFoodClickListener,
         }
         applyFilters()
     }
+
     private fun applyFilters(searchQuery: String = "") {
-        if (selectedFilters.isEmpty()) {
-            // If selectedfilters is empty, show all food items
+        val allFoods = restaurantDetails?.recommendedFoodList?.toMutableList() ?: mutableListOf()
 
-            var allFoods =
-                restaurantDetails?.recommendedFoodList?.toMutableList() ?: mutableListOf()
-
-            if (searchQuery.isNotEmpty()) {
-                allFoods =
-                    allFoods.filter { it.foodName.contains(searchQuery, ignoreCase = true) }
-                        .toMutableList()
-            }
-
-            updatedFoodList = allFoods
-
-        } else {
+        val filteredList = if (selectedFilters.isEmpty()) {
             // If no filters are selected, show all food items
-            var filteredList =
-                restaurantDetails?.recommendedFoodList?.toMutableList() ?: mutableListOf()
-
+            allFoods
+        } else {
             // Filter based on selected filters
-            filteredList = filteredList.filter { foodItem ->
+            allFoods.filter { foodItem ->
                 selectedFilters.any { filterType ->
                     when (filterType) {
-                        "veg" -> foodItem.foodType == "Veg"
-                        "egg" -> foodItem.eggFood
-                        "nonVeg" -> foodItem.foodType == "Non-Veg"
-                        "rated4Plus" -> foodItem.foodRating >= 4
-                        "sweet" -> foodItem.sweetFood
-                        else -> false
+                        FilterType.VEG -> foodItem.foodType == "Veg"
+                        FilterType.EGG -> foodItem.eggFood
+                        FilterType.NON_VEG -> foodItem.foodType == "Non-Veg"
+                        FilterType.RATED_4_PLUS -> foodItem.foodRating >= 4
+                        FilterType.SWEET -> foodItem.sweetFood
                     }
                 }
             }.toMutableList()
-
-            // Apply search filter if there any search query
-            if (searchQuery.isNotEmpty()) {
-                filteredList =
-                    filteredList.filter { it.foodName.contains(searchQuery, ignoreCase = true) }
-                        .toMutableList()
-            }
-
-            updatedFoodList = filteredList
         }
 
-        if (updatedFoodList.isEmpty()){
+        // Apply search filter if there is any search query
+        val finalList = if (searchQuery.isNotEmpty()) {
+            filteredList.filter { it.foodName.contains(searchQuery, ignoreCase = true) }.toMutableList()
+        } else {
+            filteredList
+        }
+
+        // Update the UI
+        if (finalList.isEmpty()) {
             binding.noFoodAvailable.visibility = View.VISIBLE
             binding.recyclerView.visibility = View.GONE
-        }else{
+        } else {
             binding.noFoodAvailable.visibility = View.GONE
             binding.recyclerView.visibility = View.VISIBLE
-
-            // Update the updated food list and refresh the adapter
-            showFoodInRestaurantDetailsAdapter.updateList(updatedFoodList)
+            showFoodInRestaurantDetailsAdapter.updateList(finalList)
             showFoodInRestaurantDetailsAdapter.notifyDataSetChanged()
-
         }
-        }
-
+    }
 
     private fun fetchAndMergeFoodItems(restaurantDetails: RestaurantDetails) {
         roomDbViewModel.fetchAndUpdateCartItems()

@@ -44,6 +44,7 @@ class DiningFragment : Fragment() {
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var savedAddresses: List<UserSavedAddress>
     private val REQUEST_CODE_SPEECH_INPUT = 10
+    private val appSharedPreferences by lazy { activity?.let { AppSharedPreferences.getInstance(it) } }
 
 
     override fun onCreateView(
@@ -74,9 +75,9 @@ class DiningFragment : Fragment() {
 
 
         val appPreferences = AppSharedPreferences
-        val isSkipBtnClick = appPreferences.getBoolean(PrefKeys.SKIP_BTN_CLICK)
+        val isSkipBtnClick = appSharedPreferences?.getBoolean(PrefKeys.SKIP_BTN_CLICK)
 
-        if (isSkipBtnClick) {
+        if (isSkipBtnClick == true) {
             binding.profile.visibility = View.GONE
             binding.menuIcon.visibility = View.VISIBLE
 

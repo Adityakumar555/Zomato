@@ -7,7 +7,7 @@ class ZomatoApp: Application() {
 
     override fun onCreate() {
         super.onCreate()
-        AppSharedPreferences.initilize(applicationContext)
+     //   AppSharedPreferences.initilize(applicationContext)
     }
 
 }

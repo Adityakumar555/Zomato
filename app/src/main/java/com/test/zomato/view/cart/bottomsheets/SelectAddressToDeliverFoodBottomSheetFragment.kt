@@ -32,6 +32,8 @@ class SelectAddressToDeliverFoodBottomSheetFragment : BottomSheetDialogFragment(
     private lateinit var mainViewModel: MainViewModel
     private lateinit var addressAdapter: ShowAllSavedAddressAdapter
 
+    private val appSharedPreferences by lazy { activity?.let { AppSharedPreferences.getInstance(it) } }
+
     override fun onAttach(context: Context) {
         super.onAttach(context)
         listner = context as ShowCartFoodDetailsActivity
@@ -56,9 +58,9 @@ class SelectAddressToDeliverFoodBottomSheetFragment : BottomSheetDialogFragment(
             dismiss()
         }*/
 
-        val isSkipBtnClick = AppSharedPreferences.getBoolean(PrefKeys.SKIP_BTN_CLICK)
+        val isSkipBtnClick = appSharedPreferences?.getBoolean(PrefKeys.SKIP_BTN_CLICK)
 
-        if (isSkipBtnClick) {
+        if (isSkipBtnClick == true) {
             binding.blinketCard.visibility = View.GONE
         }else{
             binding.blinketCard.visibility = View.GONE

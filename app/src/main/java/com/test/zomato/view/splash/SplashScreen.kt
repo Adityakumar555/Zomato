@@ -18,6 +18,7 @@ import com.test.zomato.utils.PrefKeys
 class SplashScreen : AppCompatActivity() {
 
     private lateinit var myHelper: MyHelper
+    private val appSharedPreferences by lazy { AppSharedPreferences.getInstance(this) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,22 +29,22 @@ class SplashScreen : AppCompatActivity() {
         myHelper.setStatusBarIconColor(this,true)
 
 
-        val isSkipBtnClick = AppSharedPreferences.getBoolean(PrefKeys.SKIP_BTN_CLICK)
-        val hasVisitedMainActivity = AppSharedPreferences.getBoolean(PrefKeys.VISITED_MAIN_ACTIVITY, false)
-        val hasVisitedSetLocation = AppSharedPreferences.getBoolean(PrefKeys.VISITED_SET_LOCATION, false)
+        val isSkipBtnClick = appSharedPreferences?.getBoolean(PrefKeys.SKIP_BTN_CLICK)
+        val hasVisitedMainActivity = appSharedPreferences?.getBoolean(PrefKeys.VISITED_MAIN_ACTIVITY)
+        val hasVisitedSetLocation = appSharedPreferences?.getBoolean(PrefKeys.VISITED_SET_LOCATION)
 
-        if (isSkipBtnClick) {
+        if (isSkipBtnClick == true) {
             Handler(Looper.getMainLooper()).postDelayed({
             startActivity(Intent(this, UserSignUpActivity::class.java))
             }, 1000)
         }else{
             Handler(Looper.getMainLooper()).postDelayed({
                 when {
-                    hasVisitedMainActivity -> {
+                    hasVisitedMainActivity == true -> {
                         // Navigate directly to MainActivity
                         startActivity(Intent(this, MainActivity::class.java))
                     }
-                    hasVisitedSetLocation -> {
+                    hasVisitedSetLocation == true -> {
                         // Navigate directly to SetLocationActivity
                         startActivity(Intent(this, SetLocationPermissionActivity::class.java))
                     }

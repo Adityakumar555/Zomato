@@ -60,6 +60,7 @@ class HomeFragment : Fragment(), RestaurantsClickListener {
 
     private lateinit var savedAddresses: List<UserSavedAddress>
     private val REQUEST_CODE_SPEECH_INPUT = 10
+    private val appSharedPreferences by lazy { activity?.let { AppSharedPreferences.getInstance(it) } }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -73,9 +74,7 @@ class HomeFragment : Fragment(), RestaurantsClickListener {
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
 
 
-
-        val appPreferences =  AppSharedPreferences
-        val isSkipBtnClick = appPreferences.getBoolean(PrefKeys.SKIP_BTN_CLICK)
+        val isSkipBtnClick = appSharedPreferences?.getBoolean(PrefKeys.SKIP_BTN_CLICK)
 
         // when user click on skip btn
         if (isSkipBtnClick == true) {

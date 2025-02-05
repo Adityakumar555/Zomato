@@ -29,7 +29,7 @@ class MainActivity : AppCompatActivity(), OrderPlcaeClickListener {
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var mainViewModel: MainViewModel
     private lateinit var binding: ActivityMainBinding
-    private val appSharedPreferences by lazy { AppSharedPreferences }
+    private val appSharedPreferences by lazy { AppSharedPreferences.getInstance(this) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,7 +37,7 @@ class MainActivity : AppCompatActivity(), OrderPlcaeClickListener {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        appSharedPreferences.saveBoolean(PrefKeys.VISITED_MAIN_ACTIVITY, true)
+        appSharedPreferences?.saveBoolean(PrefKeys.VISITED_MAIN_ACTIVITY, true)
 
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
@@ -125,8 +125,8 @@ class MainActivity : AppCompatActivity(), OrderPlcaeClickListener {
 
     // Function to save location (latitude and longitude) to SharedPreferences
     private fun saveLocationToSharedPreferences(latitude: Double, longitude: Double) {
-        appSharedPreferences.saveFloat(PrefKeys.LATITUDE, latitude.toFloat())
-        appSharedPreferences.saveFloat(PrefKeys.LONGITUDE, longitude.toFloat())
+        appSharedPreferences?.saveFloat(PrefKeys.LATITUDE, latitude.toFloat())
+        appSharedPreferences?.saveFloat(PrefKeys.LONGITUDE, longitude.toFloat())
     }
 
     private fun loadFragment(fragment: Fragment) {
