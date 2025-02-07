@@ -237,7 +237,7 @@ class MyHelper(private val context: Context) {
     }
 
     fun numberIs():String{
-        val userPhoneNumber = AppSharedPreferences.getInstance(context)?.getString(PrefKeys.USER_NUMBER) ?: ""
+        val userPhoneNumber = appSharedPreferences?.getString(PrefKeys.USER_NUMBER) ?: ""
         return userPhoneNumber
     }
 
